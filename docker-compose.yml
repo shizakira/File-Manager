@@ -47,16 +47,6 @@ services:
     networks:
       - sw
 
-  adminer:
-    image: adminer
-    ports:
-      - 3081:8080
-    restart: unless-stopped
-    depends_on:
-      - sw-mysql
-    networks:
-      - sw
-
 networks:
   sw:
     driver: bridge
