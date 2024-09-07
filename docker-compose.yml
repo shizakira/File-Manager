@@ -1,0 +1,62 @@
+services:
+  sw-php:
+    build:
+      context: .
+      dockerfile: ./.docker/php/Dockerfile
+    volumes:
+      - ./:/var/www
+      - ./vendor:/var/www/vendor
+    ports:
+      - 8000:9000
+    restart: unless-stopped
+    depends_on:
+      - sw-mysql
+    networks:
+      - sw
+    command: >
+      sh -c "chmod 777 /var/www/src/uploads && php-fpm"
+
+  sw-mysql:
+    image: mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    restart: unless-stopped
+    ports:
+      - ${DB_PORT}:3306
+    volumes:
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    networks:
+      - sw
+
+  sw-nginx:
+    image: nginx:latest
+    ports:
+      - 3000:80
+    depends_on:
+      - sw-php
+      - sw-mysql
+    restart: unless-stopped
+    volumes:
+      - ./.docker/nginx/logs:/var/log/nginx
+      - ./.docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./:/var/www
+    networks:
+      - sw
+
+  adminer:
+    image: adminer
+    ports:
+      - 3081:8080
+    restart: unless-stopped
+    depends_on:
+      - sw-mysql
+    networks:
+      - sw
+
+networks:
+  sw:
+    driver: bridge
