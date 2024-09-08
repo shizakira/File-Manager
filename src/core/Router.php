@@ -16,10 +16,6 @@ class Router
         $uriPath = strtok($uri, '?');
         $queryString = parse_url($uri, PHP_URL_QUERY);
 
-        if (preg_match('/^\/uploads\//', $uriPath)) {
-            return false;
-        }
-
         $queryParams = [];
         if ($queryString !== null) {
             parse_str($queryString, $queryParams);
@@ -33,16 +29,10 @@ class Router
 
         if (isset($this->routes[$action])) {
             $handler = $this->routes[$action];
-
-            if (is_callable($handler)) {
-                $handler();
-            } else {
-                $controller = new $handler[0];
-                $method = $handler[1];
-                $controller->$method();
-            }
+            return $handler();
         } else {
-            echo "404 Not Found. Action: $action";
+            http_response_code(404);
+            return;
         }
     }
 }

@@ -50,6 +50,36 @@ class App
 
     public function run()
     {
-        $this->router->dispatch($_SERVER['REQUEST_URI']);
+        $response = $this->router->dispatch($_SERVER['REQUEST_URI']);
+
+        match (true) {
+            is_string($response) => $this->handleStringResponse($response),
+            isset($response['view'], $response['data']) => $this->renderView($response['view'], $response['data']),
+            isset($response['filePath'], $response['fileName']) => $this->sendFile($response['filePath'], $response['fileName']),
+            default => $this->handleUnknownResponseType($response),
+        };
+    }
+
+    private function handleStringResponse($response)
+    {
+        echo $response;
+    }
+
+    private function handleUnknownResponseType($response)
+    {
+        echo "Неизвестный тип ответа";
+    }
+    private function renderView($viewPath, $data)
+    {
+        extract($data);
+        require $viewPath;
+    }
+
+    private function sendFile($filePath, $fileName)
+    {
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Content-Length: ' . filesize($filePath));
+        readfile($filePath);
     }
 }

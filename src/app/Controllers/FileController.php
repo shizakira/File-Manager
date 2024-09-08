@@ -27,7 +27,10 @@ class FileController
         $filesTree = $this->fileService->getFileTree();
         $treeHtml = $this->fileViewRenderer->renderTree($filesTree);
 
-        require $_SERVER['DOCUMENT_ROOT'] . self::INDEX_VIEW_PATH;
+        return [
+            'view' => $_SERVER['DOCUMENT_ROOT'] . self::INDEX_VIEW_PATH,
+            'data' => compact('treeHtml')
+        ];
     }
 
     public function addDirectory()
@@ -39,67 +42,62 @@ class FileController
 
         if (!$dirname) {
             http_response_code(400);
-            echo "Ошибка: Имя каталога не указано.";
-            return;
+            return "Ошибка: Имя каталога не указано.";
         }
 
         if (!$this->validator->validateName($dirname)) {
             http_response_code(400);
-            echo "Ошибка: Имя каталога не может превышать 255 символов.";
-            return;
+            return "Ошибка: Имя каталога не может превышать 255 символов.";
         }
 
         $this->fileService->addDirectory($dirname, $parentId);
-        echo "Каталог добавлен";
+        return "Каталог добавлен";
     }
 
     public function uploadFile()
     {
         if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
             http_response_code(400);
-            echo "Файл не загружен";
-            return;
+            return "Файл не загружен";
         }
 
         $fileName = $_FILES['file']['name'];
 
         if (!$this->validator->validateName($fileName)) {
             http_response_code(400);
-            echo "Ошибка: Имя файла не может превышать 255 символов.";
-            return;
+            return "Ошибка: Имя файла не может превышать 255 символов.";
         }
 
         if (!$this->validator->validateExtension($fileName)) {
             http_response_code(400);
-            echo "Ошибка: Неверный формат файла. Разрешены только .jpg, .jpeg, .png, .gif, .txt, .docx, .pdf";
-            return;
+            return "Ошибка: Неверный формат файла. Разрешены только .jpg, .jpeg, .png, .gif, .txt, .docx, .pdf";
         }
 
         $filePath = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . $fileName;
 
         if (!move_uploaded_file($_FILES['file']['tmp_name'], $filePath)) {
             http_response_code(500);
-            echo "Ошибка при загрузке файла";
-            return;
+            return "Ошибка при загрузке файла";
         }
 
         $parentId = $_POST['parent_id'] ?? null;
         $this->fileService->uploadFile($fileName, $parentId);
-        echo "Файл успешно загружен";
+        return "Файл успешно загружен";
     }
+
 
     public function deleteItem()
     {
         $id = $_POST['id'];
         if (!$id) {
             http_response_code(400);
-            echo "Ошибка: ID не указан.";
-            return;
+            return "Ошибка: ID не указан.";
         }
 
         $this->fileService->deleteItem($id);
-        echo "Элемент удален";
+        return "Элемент удален";
     }
+
 
     public function download()
     {
@@ -107,19 +105,19 @@ class FileController
 
         if (!$fileName) {
             http_response_code(400);
-            echo "Ошибка: Имя файла не указано.";
-            return;
+            return "Ошибка: Имя файла не указано.";
         }
 
         $filePath = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . basename($fileName);
 
         if (!file_exists($filePath)) {
             http_response_code(404);
-            echo "Ошибка: Файл не найден.";
-            return;
+            return "Ошибка: Файл не найден.";
         }
 
-        header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
-        readfile($filePath);
+        return [
+            'filePath' => $filePath,
+            'fileName' => basename($filePath)
+        ];
     }
 }
