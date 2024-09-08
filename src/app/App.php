@@ -19,11 +19,30 @@ class App
 
     private function initializeRoutes()
     {
-        $this->router->add('/', [$this->controllerFactory->createFileController(), 'index']);
-        $this->router->add('/add_directory', [$this->controllerFactory->createFileController(), 'addDirectory']);
-        $this->router->add('/upload_file', [$this->controllerFactory->createFileController(), 'uploadFile']);
-        $this->router->add('/delete_item', [$this->controllerFactory->createFileController(), 'deleteItem']);
-        $this->router->add('/download', [$this->controllerFactory->createFileController(), 'download']);
+        $this->router->add('/', function () {
+            $controller = $this->controllerFactory->createFileController();
+            return $controller->index();
+        });
+
+        $this->router->add('/add_directory', function () {
+            $controller = $this->controllerFactory->createFileController();
+            return $controller->addDirectory();
+        });
+
+        $this->router->add('/upload_file', function () {
+            $controller = $this->controllerFactory->createFileController();
+            return $controller->uploadFile();
+        });
+
+        $this->router->add('/delete_item', function () {
+            $controller = $this->controllerFactory->createFileController();
+            return $controller->deleteItem();
+        });
+
+        $this->router->add('/download', function () {
+            $controller = $this->controllerFactory->createFileController();
+            return $controller->download();
+        });
     }
 
     public function run()

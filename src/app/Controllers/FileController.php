@@ -12,13 +12,13 @@ class FileController
     private $fileService;
     private $fileViewRenderer;
     private $validator;
-
-    public function __construct()
+    private $indexPath = '/app/Views/index.php';
+    private $uploadPath = '/uploads/';
+    public function __construct(FileService $fileService, FileViewRenderer $fileViewRenderer, Validator $validator)
     {
-        $fileModel = new FileModel();
-        $this->fileService = new FileService($fileModel);
-        $this->fileViewRenderer = new FileViewRenderer();
-        $this->validator = new Validator();
+        $this->fileService = $fileService;
+        $this->fileViewRenderer = $fileViewRenderer;
+        $this->validator = $validator;
     }
 
     public function index()
@@ -26,7 +26,7 @@ class FileController
         $filesTree = $this->fileService->getFileTree();
         $treeHtml = $this->fileViewRenderer->renderTree($filesTree);
 
-        require __DIR__ . '/../Views/index.php';
+        require $_SERVER['DOCUMENT_ROOT'] . $this->indexPath;
     }
 
     public function addDirectory()
@@ -74,7 +74,7 @@ class FileController
             return;
         }
 
-        $filePath = 'uploads/' . $fileName;
+        $filePath = $_SERVER['DOCUMENT_ROOT'] . $this->uploadPath . $fileName;
 
         if (!move_uploaded_file($_FILES['file']['tmp_name'], $filePath)) {
             http_response_code(500);
@@ -110,7 +110,7 @@ class FileController
             return;
         }
 
-        $filePath = __DIR__ . '/../../uploads/' . basename($fileName);
+        $filePath = $_SERVER['DOCUMENT_ROOT'] . $this->uploadPath . basename($fileName);
 
         if (!file_exists($filePath)) {
             http_response_code(404);

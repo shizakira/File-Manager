@@ -32,14 +32,17 @@ class Router
         }
 
         if (isset($this->routes[$action])) {
-
             $handler = $this->routes[$action];
-            $controller = new $handler[0];
-            $method = $handler[1];
-            $controller->$method();
+
+            if (is_callable($handler)) {
+                $handler();
+            } else {
+                $controller = new $handler[0];
+                $method = $handler[1];
+                $controller->$method();
+            }
         } else {
             echo "404 Not Found. Action: $action";
-            var_dump($this->routes);
         }
     }
 }
