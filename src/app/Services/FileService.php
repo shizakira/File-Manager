@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
-use App\Repositories\Interfaces\FileRepositoryInterface;
 use Core\Validator;
 
 class FileService
 {
     private $fileRepository;
     private $validator;
+
+    private const UPLOAD_PATH = '/uploads/';
 
     public function __construct($fileRepository, $validator)
     {
@@ -29,7 +30,7 @@ class FileService
         }
 
         $parentPath = $this->getParentPath($parentId);
-        $directoryPath = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $parentPath . $dirname;
+        $directoryPath = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . $parentPath . $dirname;
 
         if (!is_dir($directoryPath)) {
             if (!mkdir($directoryPath, 0777, true)) {
@@ -56,7 +57,7 @@ class FileService
         }
 
         $parentPath = $this->getParentPath($parentId);
-        $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $parentPath;
+        $uploadDir = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . $parentPath;
         $filePath = $uploadDir . $fileName;
 
         if (!is_dir($uploadDir)) {
@@ -81,7 +82,7 @@ class FileService
             return "Элемент не найден.";
         }
 
-        $itemPath = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $this->getParentPath($item['parent_id']) . $item['name'];
+        $itemPath = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . $this->getParentPath($item['parent_id']) . $item['name'];
 
         if ($item['type'] === 'file') {
             if (file_exists($itemPath) && !unlink($itemPath)) {

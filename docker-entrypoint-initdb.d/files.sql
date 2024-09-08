@@ -5,7 +5,7 @@ CREATE TABLE `files` (
   `parent_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `parent_id` (`parent_id`),
-  CONSTRAINT `files_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `files` (`id`) ON DELETE CASCADE
+  CONSTRAINT fk_parent_id FOREIGN KEY (parent_id) REFERENCES files(id) ON DELETE CASCADE
 );
 
 INSERT INTO `files` (`id`, `name`, `type`, `parent_id`) VALUES
