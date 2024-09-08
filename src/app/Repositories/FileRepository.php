@@ -28,6 +28,13 @@ class FileRepository implements FileRepositoryInterface
         return $stmt->fetchAll();
     }
 
+    public function getItemById($id)
+    {
+        $sql = "SELECT * FROM files WHERE id = :id";
+        $stmt = $this->executeQuery($sql, ['id' => $id]);
+        return $stmt->fetch();
+    }
+
     public function addDirectory($name, $parent_id)
     {
         $sql = "INSERT INTO files (name, type, parent_id) VALUES (:name, 'directory', :parent_id)";

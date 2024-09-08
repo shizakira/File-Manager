@@ -112,8 +112,12 @@ function isImageFile(fileName) {
 }
 
 function displayImage(fileName) {
+    const selectedFilePath = document
+        .querySelector("#selected-file")
+        .textContent.trim();
     const imageContainer = document.querySelector("#image-preview");
-    imageContainer.innerHTML = `<img src="uploads/${fileName}" alt="Image">`;
+
+    imageContainer.innerHTML = `<img src="uploads/${selectedFilePath}" alt="Image">`;
     imageContainer.style.display = "block";
 }
 
@@ -216,20 +220,18 @@ async function deleteItem() {
 }
 
 function downloadFile() {
-    const selectedFile =
-        document.querySelector("#control-form").dataset.selectedId;
-    const selectedType =
-        document.querySelector("#control-form").dataset.selectedType;
     const selectedText = document
         .querySelector("#selected-file")
         .textContent.trim();
+    const selectedType =
+        document.querySelector("#control-form").dataset.selectedType;
 
-    if (selectedFile && selectedType === "file") {
+    if (selectedType === "file") {
         const downloadLink = document.createElement("a");
-        downloadLink.href = `/download?filename=${encodeURIComponent(
-            selectedText
-        )}`;
-        downloadLink.download = selectedText;
+        downloadLink.href = `/uploads/${encodeURIComponent(selectedText)}`;
+        downloadLink.download = selectedText.substring(
+            selectedText.lastIndexOf("/") + 1
+        );
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
