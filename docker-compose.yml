@@ -12,7 +12,7 @@ services:
     networks:
       - sw
     command: >
-      sh -c "chmod 777 /var/www/src/uploads && php-fpm"
+      sh -c "if [ ! -d /var/www/vendor ]; then composer install; fi && chmod 777 /var/www/src/uploads && php-fpm"
 
   sw-mysql:
     image: mysql
