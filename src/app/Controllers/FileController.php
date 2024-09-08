@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Services\FileService;
 use App\Views\FileViewRenderer;
-use App\Models\FileModel;
 use Core\Validator;
 
 class FileController
@@ -12,8 +11,10 @@ class FileController
     private $fileService;
     private $fileViewRenderer;
     private $validator;
-    private $indexPath = '/app/Views/index.php';
-    private $uploadPath = '/uploads/';
+
+    private const INDEX_VIEW_PATH = '/app/Views/index.php';
+    private const UPLOAD_PATH = '/uploads/';
+
     public function __construct(FileService $fileService, FileViewRenderer $fileViewRenderer, Validator $validator)
     {
         $this->fileService = $fileService;
@@ -26,7 +27,7 @@ class FileController
         $filesTree = $this->fileService->getFileTree();
         $treeHtml = $this->fileViewRenderer->renderTree($filesTree);
 
-        require $_SERVER['DOCUMENT_ROOT'] . $this->indexPath;
+        require $_SERVER['DOCUMENT_ROOT'] . self::INDEX_VIEW_PATH;
     }
 
     public function addDirectory()
@@ -74,7 +75,7 @@ class FileController
             return;
         }
 
-        $filePath = $_SERVER['DOCUMENT_ROOT'] . $this->uploadPath . $fileName;
+        $filePath = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . $fileName;
 
         if (!move_uploaded_file($_FILES['file']['tmp_name'], $filePath)) {
             http_response_code(500);
@@ -110,7 +111,7 @@ class FileController
             return;
         }
 
-        $filePath = $_SERVER['DOCUMENT_ROOT'] . $this->uploadPath . basename($fileName);
+        $filePath = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . basename($fileName);
 
         if (!file_exists($filePath)) {
             http_response_code(404);
@@ -118,11 +119,7 @@ class FileController
             return;
         }
 
-        header('Content-Description: File Transfer');
-        header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
-        header('Content-Length: ' . filesize($filePath));
         readfile($filePath);
-        exit;
     }
 }

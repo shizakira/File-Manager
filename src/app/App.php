@@ -4,14 +4,17 @@ namespace App;
 
 use App\Factories\ControllerFactory;
 use Core\Router;
+use Core\Config;
 
 class App
 {
     private $router;
     private $controllerFactory;
+    private $config;
 
     public function __construct(Router $router, ControllerFactory $controllerFactory)
     {
+        $this->config = Config::getInstance();
         $this->router = $router;
         $this->controllerFactory = $controllerFactory;
         $this->initializeRoutes();
@@ -19,27 +22,27 @@ class App
 
     private function initializeRoutes()
     {
-        $this->router->add('/', function () {
+        $this->router->add($this->config->getEnv('ROUTE_INDEX'), function () {
             $controller = $this->controllerFactory->createFileController();
             return $controller->index();
         });
 
-        $this->router->add('/add_directory', function () {
+        $this->router->add($this->config->getEnv('ROUTE_ADD_DIRECTORY'), function () {
             $controller = $this->controllerFactory->createFileController();
             return $controller->addDirectory();
         });
 
-        $this->router->add('/upload_file', function () {
+        $this->router->add($this->config->getEnv('ROUTE_UPLOAD_FILE'), function () {
             $controller = $this->controllerFactory->createFileController();
             return $controller->uploadFile();
         });
 
-        $this->router->add('/delete_item', function () {
+        $this->router->add($this->config->getEnv('ROUTE_DELETE_ITEM'), function () {
             $controller = $this->controllerFactory->createFileController();
             return $controller->deleteItem();
         });
 
-        $this->router->add('/download', function () {
+        $this->router->add($this->config->getEnv('ROUTE_DOWNLOAD'), function () {
             $controller = $this->controllerFactory->createFileController();
             return $controller->download();
         });
