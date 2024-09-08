@@ -4,23 +4,20 @@ namespace App\Controllers;
 
 use App\Services\FileService;
 use App\Views\FileViewRenderer;
-use Core\Validator;
 use Core\Request;
 
 class FileController
 {
-    private $fileService;
-    private $fileViewRenderer;
-    private $validator;
+    private FileService $fileService;
+    private FileViewRenderer $fileViewRenderer;
 
     private const INDEX_VIEW_PATH = '/app/Views/index.php';
     private const UPLOAD_PATH = '/uploads/';
 
-    public function __construct(FileService $fileService, FileViewRenderer $fileViewRenderer, Validator $validator)
+    public function __construct(FileService $fileService, FileViewRenderer $fileViewRenderer)
     {
         $this->fileService = $fileService;
         $this->fileViewRenderer = $fileViewRenderer;
-        $this->validator = $validator;
     }
 
     public function index()
@@ -46,12 +43,13 @@ class FileController
             return "Имя каталога не указано.";
         }
 
-        if (!$this->validator->validateName($dirname)) {
+        $result = $this->fileService->addDirectory($dirname, $parentId);
+
+        if ($result !== true) {
             http_response_code(400);
-            return "Имя каталога не может превышать " . $this->validator::MAX_NAME_LENGTH . " символов.";
+            return $result;
         }
 
-        $this->fileService->addDirectory($dirname, $parentId);
         return "Каталог добавлен";
     }
 
@@ -63,26 +61,15 @@ class FileController
         }
 
         $fileName = $_FILES['file']['name'];
-
-        if (!$this->validator->validateName($fileName)) {
-            http_response_code(400);
-            return "Имя файла не может превышать " . $this->validator::MAX_NAME_LENGTH . " символов.";
-        }
-
-        if (!$this->validator->validateExtension($fileName)) {
-            http_response_code(400);
-            return "Неверный формат файла. Разрешены только " . implode(', ', $this->validator::ALLOWED_EXTENSIONS);
-        }
-
-        $filePath = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . $fileName;
-
-        if (!move_uploaded_file($_FILES['file']['tmp_name'], $filePath)) {
-            http_response_code(500);
-            return "Ошибка при загрузке файла";
-        }
-
         $parentId = Request::post('parent_id');
-        $this->fileService->uploadFile($fileName, $parentId);
+
+        $result = $this->fileService->uploadFile($fileName, $parentId, $_FILES['file']['tmp_name']);
+
+        if ($result !== true) {
+            http_response_code(400);
+            return $result;
+        }
+
         return "Файл успешно загружен";
     }
 
@@ -94,7 +81,12 @@ class FileController
             return "Ошибка: ID не указан.";
         }
 
-        $this->fileService->deleteItem($id);
+        $result = $this->fileService->deleteItem($id);
+        if ($result !== true) {
+            http_response_code(400);
+            return $result;
+        }
+
         return "Элемент удален";
     }
 

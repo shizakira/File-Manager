@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Repositories;
 
 use Core\Database;
-use App\Repositories\FileRepositoryInterface;
+use App\Repositories\Interfaces\FileRepositoryInterface;
 
-class FileModel implements FileRepositoryInterface
+class FileRepository implements FileRepositoryInterface
 {
     private $pdo;
 
@@ -26,28 +26,6 @@ class FileModel implements FileRepositoryInterface
         $sql = "SELECT * FROM files";
         $stmt = $this->executeQuery($sql);
         return $stmt->fetchAll();
-    }
-
-    public function buildTree($parent_id = null)
-    {
-        $items = $this->getFiles();
-        $tree = $this->buildTreeRecursive($items, $parent_id);
-        return $tree;
-    }
-
-    private function buildTreeRecursive($items, $parent_id = null)
-    {
-        $tree = [];
-        foreach ($items as $item) {
-            if ($item['parent_id'] === $parent_id) {
-                $children = $this->buildTreeRecursive($items, $item['id']);
-                if ($children) {
-                    $item['children'] = $children;
-                }
-                $tree[] = $item;
-            }
-        }
-        return $tree;
     }
 
     public function addDirectory($name, $parent_id)

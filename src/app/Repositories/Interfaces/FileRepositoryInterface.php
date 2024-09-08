@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Interfaces;
 
 interface FileRepositoryInterface
 {
@@ -8,5 +8,4 @@ interface FileRepositoryInterface
     public function addDirectory($name, $parent_id);
     public function uploadFile($name, $parent_id);
     public function deleteItem($id);
-    public function buildTree($parent_id = null);
 }
