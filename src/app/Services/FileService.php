@@ -34,6 +34,10 @@ class FileService
 
     public function uploadFile($fileName, $parentId, $tmpFilePath)
     {
+        if (!$this->validator->validateFileSize($tmpFilePath)) {
+            return "Размер файла не должен превышать " . (Validator::MAX_FILE_SIZE / 1024 / 1024) . " МБ.";
+        }
+
         if (!$this->validator->validateName($fileName)) {
             return "Имя файла не может превышать " . Validator::MAX_NAME_LENGTH . " символов.";
         }

@@ -82,6 +82,7 @@ class FileController
         }
 
         $result = $this->fileService->deleteItem($id);
+
         if ($result !== true) {
             http_response_code(400);
             return $result;

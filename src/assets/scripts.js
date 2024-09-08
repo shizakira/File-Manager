@@ -180,11 +180,7 @@ async function uploadFile() {
                 location.reload();
             }
         } else {
-            if (response.status === 413) {
-                alert("Превышен максимальный размер файла.");
-            } else {
-                alert(`Ошибка: ${data}`);
-            }
+            alert(`Ошибка: ${data}`);
         }
     } catch (error) {
         alert("Произошла ошибка во время загрузки файла.");
