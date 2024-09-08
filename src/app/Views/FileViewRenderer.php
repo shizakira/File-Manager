@@ -10,29 +10,21 @@ class FileViewRenderer
             return '';
         }
 
-        $output = '<ul>';
-        foreach ($tree as $node) {
-            $output .= $this->renderNode($node);
-        }
-        $output .= '</ul>';
-
-        return $output;
+        ob_start();
+        $this->renderView('tree.php', ['tree' => $tree]);
+        return ob_get_clean();
     }
 
     private function renderNode($node)
     {
-        $id = htmlspecialchars($node['id'], ENT_QUOTES);
-        $type = htmlspecialchars($node['type'], ENT_QUOTES);
-        $name = htmlspecialchars($node['name'], ENT_QUOTES);
+        ob_start();
+        $this->renderView('node.php', ['node' => $node]);
+        return ob_get_clean();
+    }
 
-        $output = "<li data-id=\"{$id}\" data-type=\"{$type}\">{$name}";
-
-        if (!empty($node['children'])) {
-            $output .= $this->renderTree($node['children']);
-        }
-
-        $output .= '</li>';
-
-        return $output;
+    private function renderView($view, $data = [])
+    {
+        extract($data);
+        include $view;
     }
 }
