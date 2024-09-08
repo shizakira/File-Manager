@@ -6,8 +6,6 @@ services:
     volumes:
       - ./:/var/www
       - ./vendor:/var/www/vendor
-    ports:
-      - 8000:9000
     restart: unless-stopped
     depends_on:
       - sw-mysql
@@ -41,7 +39,6 @@ services:
       - sw-mysql
     restart: unless-stopped
     volumes:
-      - ./.docker/nginx/logs:/var/log/nginx
       - ./.docker/nginx/conf.d:/etc/nginx/conf.d
       - ./:/var/www
     networks:
