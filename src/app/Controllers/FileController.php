@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Services\FileService;
 use App\Views\FileViewRenderer;
 use Core\Validator;
+use Core\Request;
 
 class FileController
 {
@@ -35,8 +36,8 @@ class FileController
 
     public function addDirectory()
     {
-        $dirname = $_POST['dirname'] ?? '';
-        $parentIdInput = $_POST['parent_id'] ?? null;
+        $dirname = Request::post('dirname');
+        $parentIdInput = Request::post('parent_id');
         $isValidParentId = isset($parentIdInput) && $parentIdInput !== 'null';
         $parentId = $isValidParentId ? (int)$parentIdInput : null;
 
@@ -80,14 +81,14 @@ class FileController
             return "Ошибка при загрузке файла";
         }
 
-        $parentId = $_POST['parent_id'] ?? null;
+        $parentId = Request::post('parent_id');
         $this->fileService->uploadFile($fileName, $parentId);
         return "Файл успешно загружен";
     }
 
     public function deleteItem()
     {
-        $id = $_POST['id'];
+        $id = Request::post('id');
         if (!$id) {
             http_response_code(400);
             return "Ошибка: ID не указан.";
@@ -99,7 +100,7 @@ class FileController
 
     public function download()
     {
-        $fileName = $_GET['filename'] ?? '';
+        $fileName = Request::get('filename');
 
         if (!$fileName) {
             http_response_code(400);
