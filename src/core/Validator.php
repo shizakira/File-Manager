@@ -4,8 +4,8 @@ namespace Core;
 
 class Validator
 {
-    private const MAX_NAME_LENGTH = 255;
-    private const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'txt', 'docx', 'pdf'];
+    public const MAX_NAME_LENGTH = 255;
+    public const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'txt', 'docx', 'pdf'];
 
     public function validateName($name)
     {

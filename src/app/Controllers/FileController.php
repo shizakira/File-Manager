@@ -42,12 +42,12 @@ class FileController
 
         if (!$dirname) {
             http_response_code(400);
-            return "Ошибка: Имя каталога не указано.";
+            return "Имя каталога не указано.";
         }
 
         if (!$this->validator->validateName($dirname)) {
             http_response_code(400);
-            return "Ошибка: Имя каталога не может превышать 255 символов.";
+            return "Имя каталога не может превышать " . $this->validator::MAX_NAME_LENGTH . " символов.";
         }
 
         $this->fileService->addDirectory($dirname, $parentId);
@@ -65,12 +65,12 @@ class FileController
 
         if (!$this->validator->validateName($fileName)) {
             http_response_code(400);
-            return "Ошибка: Имя файла не может превышать 255 символов.";
+            return "Имя файла не может превышать " . $this->validator::MAX_NAME_LENGTH . " символов.";
         }
 
         if (!$this->validator->validateExtension($fileName)) {
             http_response_code(400);
-            return "Ошибка: Неверный формат файла. Разрешены только .jpg, .jpeg, .png, .gif, .txt, .docx, .pdf";
+            return "Неверный формат файла. Разрешены только " . implode(', ', $this->validator::ALLOWED_EXTENSIONS);
         }
 
         $filePath = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . $fileName;
@@ -85,7 +85,6 @@ class FileController
         return "Файл успешно загружен";
     }
 
-
     public function deleteItem()
     {
         $id = $_POST['id'];
@@ -97,7 +96,6 @@ class FileController
         $this->fileService->deleteItem($id);
         return "Элемент удален";
     }
-
 
     public function download()
     {
