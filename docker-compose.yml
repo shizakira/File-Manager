@@ -6,13 +6,14 @@ services:
     volumes:
       - ./:/var/www
       - ./vendor:/var/www/vendor
+      - ./php-socket:/var/run/php
     restart: unless-stopped
     depends_on:
       - sw-mysql
     networks:
       - sw
     command: >
-        sh -c "cd /var/www && composer install && composer dump-autoload && chmod -R 777 /var/www/ && php-fpm"
+        sh -c "cd /var/www && composer install && composer dump-autoload && chmod -R 777 /var/www/ && chmod -R 777 /var/run/php && php-fpm"
 
   sw-mysql:
     image: mysql
@@ -33,7 +34,7 @@ services:
   sw-nginx:
     image: nginx:latest
     ports:
-      - 80:80  
+      - 80:80 
     depends_on:
       - sw-php
       - sw-mysql
@@ -41,6 +42,7 @@ services:
     volumes:
       - ./.docker/nginx/conf.d:/etc/nginx/conf.d
       - ./:/var/www
+      - ./php-socket:/var/run/php
     networks:
       - sw
 
