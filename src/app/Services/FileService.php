@@ -8,13 +8,13 @@ class FileService
 {
     private $fileRepository;
     private $validator;
+    private $fileManager;
 
-    private const UPLOAD_PATH = '/uploads/';
-
-    public function __construct($fileRepository, $validator)
+    public function __construct($fileRepository, $validator, $fileManager)
     {
         $this->fileRepository = $fileRepository;
         $this->validator = $validator;
+        $this->fileManager = $fileManager;
     }
 
     public function getFileTree()
@@ -30,12 +30,9 @@ class FileService
         }
 
         $parentPath = $this->getParentPath($parentId);
-        $directoryPath = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . $parentPath . $dirname;
 
-        if (!is_dir($directoryPath)) {
-            if (!mkdir($directoryPath, 0777, true)) {
-                return "Ошибка при создании каталога.";
-            }
+        if (!$this->fileManager->createDirectory($dirname, $parentPath)) {
+            return "Ошибка при создании каталога.";
         }
 
         $this->fileRepository->addDirectory($dirname, $parentId);
@@ -57,16 +54,9 @@ class FileService
         }
 
         $parentPath = $this->getParentPath($parentId);
-        $uploadDir = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . $parentPath;
-        $filePath = $uploadDir . $fileName;
+        $uploadDir = $this->fileManager->getUploadPath($parentPath);
 
-        if (!is_dir($uploadDir)) {
-            if (!mkdir($uploadDir, 0777, true)) {
-                return "Ошибка при создании каталога для файла.";
-            }
-        }
-
-        if (!move_uploaded_file($tmpFilePath, $filePath)) {
+        if (!$this->fileManager->moveUploadedFile($tmpFilePath, $uploadDir, $fileName)) {
             return "Ошибка при загрузке файла.";
         }
 
@@ -82,43 +72,19 @@ class FileService
             return "Элемент не найден.";
         }
 
-        $itemPath = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . $this->getParentPath($item['parent_id']) . $item['name'];
+        $itemPath = $this->fileManager->getUploadPath($this->getParentPath($item['parent_id'])) . $item['name'];
 
         if ($item['type'] === 'file') {
-            if (file_exists($itemPath) && !unlink($itemPath)) {
+            if (!$this->fileManager->deleteFile($itemPath)) {
                 return "Ошибка при удалении файла.";
             }
         } elseif ($item['type'] === 'directory') {
-            $this->deleteDirectoryRecursively($itemPath);
+            $this->fileManager->deleteDirectoryRecursively($itemPath);
         }
 
         $this->fileRepository->deleteItem($id);
+
         return true;
-    }
-
-    private function deleteDirectoryRecursively($directory)
-    {
-        if (!is_dir($directory)) {
-            return;
-        }
-
-        $items = scandir($directory);
-
-        foreach ($items as $item) {
-            if ($item === '.' || $item === '..') {
-                continue;
-            }
-
-            $itemPath = $directory . DIRECTORY_SEPARATOR . $item;
-
-            if (is_dir($itemPath)) {
-                $this->deleteDirectoryRecursively($itemPath);
-            } else {
-                unlink($itemPath);
-            }
-        }
-
-        rmdir($directory);
     }
 
     private function getParentPath($parentId)
@@ -146,6 +112,7 @@ class FileService
     private function buildTree($items, $parent_id = null)
     {
         $tree = [];
+
         foreach ($items as $item) {
             if ($item['parent_id'] === $parent_id) {
                 $children = $this->buildTree($items, $item['id']);
