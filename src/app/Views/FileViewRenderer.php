@@ -2,7 +2,9 @@
 
 namespace App\Views;
 
-class FileViewRenderer
+use App\Views\Interfaces\ViewRendererInterface;
+
+class FileViewRenderer implements ViewRendererInterface
 {
     public function renderTree($tree)
     {
@@ -12,13 +14,15 @@ class FileViewRenderer
 
         ob_start();
         $this->renderView('tree.php', ['tree' => $tree]);
+
         return ob_get_clean();
     }
 
-    private function renderNode($node)
+    public function renderNode($node)
     {
         ob_start();
         $this->renderView('node.php', ['node' => $node]);
+
         return ob_get_clean();
     }
 

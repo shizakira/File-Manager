@@ -4,8 +4,7 @@ namespace App\Repositories;
 
 use Core\Database;
 use App\Repositories\Interfaces\FileRepositoryInterface;
-use App\Models\FileModel;
-use App\Models\DirectoryModel;
+use App\Factories\ModelFactory;
 
 class FileRepository implements FileRepositoryInterface
 {
@@ -23,25 +22,14 @@ class FileRepository implements FileRepositoryInterface
         return $stmt;
     }
 
-    private function createModelFromRow($row)
-    {
-        if ($row['type'] === 'directory') {
-            return new DirectoryModel($row['id'], $row['name'], $row['parent_id']);
-        }
-
-        return new FileModel($row['id'], $row['name'], $row['parent_id']);
-    }
-
-
     public function getFiles()
     {
         $sql = "SELECT * FROM files";
         $stmt = $this->executeQuery($sql);
         $results = $stmt->fetchAll();
 
-        return array_map([$this, 'createModelFromRow'], $results);
+        return array_map([ModelFactory::class, 'createModelFromRow'], $results);
     }
-
 
     public function getItemById($id)
     {
@@ -50,7 +38,7 @@ class FileRepository implements FileRepositoryInterface
         $result = $stmt->fetch();
 
         if ($result) {
-            return $this->createModelFromRow($result);
+            return ModelFactory::createModelFromRow($result);
         }
 
         return null;

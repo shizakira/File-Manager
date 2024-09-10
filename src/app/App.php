@@ -5,6 +5,7 @@ namespace App;
 use App\Factories\ControllerFactory;
 use Core\Router;
 use Core\Config;
+use Core\Response;
 
 class App
 {
@@ -22,64 +23,49 @@ class App
 
     private function initializeRoutes()
     {
-        $this->router->add($this->config->getEnv('ROUTE_INDEX'), function () {
-            $controller = $this->controllerFactory->createFileController();
-            return $controller->index();
-        });
+        $routes = [
+            'ROUTE_INDEX' => 'index',
+            'ROUTE_ADD_DIRECTORY' => 'addDirectory',
+            'ROUTE_UPLOAD_FILE' => 'uploadFile',
+            'ROUTE_DELETE_ITEM' => 'deleteItem',
+            'ROUTE_DOWNLOAD' => 'download'
+        ];
 
-        $this->router->add($this->config->getEnv('ROUTE_ADD_DIRECTORY'), function () {
-            $controller = $this->controllerFactory->createFileController();
-            return $controller->addDirectory();
-        });
-
-        $this->router->add($this->config->getEnv('ROUTE_UPLOAD_FILE'), function () {
-            $controller = $this->controllerFactory->createFileController();
-            return $controller->uploadFile();
-        });
-
-        $this->router->add($this->config->getEnv('ROUTE_DELETE_ITEM'), function () {
-            $controller = $this->controllerFactory->createFileController();
-            return $controller->deleteItem();
-        });
-
-        $this->router->add($this->config->getEnv('ROUTE_DOWNLOAD'), function () {
-            $controller = $this->controllerFactory->createFileController();
-            return $controller->download();
-        });
+        foreach ($routes as $envKey => $method) {
+            $this->router->add($this->config->getEnv($envKey), function () use ($method) {
+                $controller = $this->controllerFactory->createFileController();
+                return $controller->$method();
+            });
+        }
     }
 
     public function run()
     {
         $response = $this->router->dispatch($_SERVER['REQUEST_URI']);
+        $responseType = $this->determineResponseType($response);
 
-        match (true) {
-            is_string($response) => $this->handleStringResponse($response),
-            isset($response['view'], $response['data']) => $this->renderView($response['view'], $response['data']),
-            isset($response['filePath'], $response['fileName']) => $this->sendFile($response['filePath'], $response['fileName']),
-            default => $this->handleUnknownResponseType($response),
+        match ($responseType) {
+            'view' => Response::render($response['view'], $response['data']),
+            'file' => Response::download($response['filePath'], $response['fileName']),
+            'message' => Response::send($response['message'], $response['statusCode']),
+            'error' => Response::send($response['error'], $response['statusCode']),
+            default => $this->handleUnknownResponseType(),
         };
     }
 
-    private function handleStringResponse($response)
+    private function determineResponseType($response)
     {
-        echo $response;
+        return match (true) {
+            isset($response['view'], $response['data']) => 'view',
+            isset($response['filePath'], $response['fileName']) => 'file',
+            isset($response['message'], $response['statusCode']) => 'message',
+            isset($response['error'], $response['statusCode']) => 'error',
+            default => 'unknown',
+        };
     }
 
-    private function handleUnknownResponseType($response)
+    private function handleUnknownResponseType()
     {
-        echo "Неизвестный тип ответа";
-    }
-    private function renderView($viewPath, $data)
-    {
-        extract($data);
-        require $viewPath;
-    }
-
-    private function sendFile($filePath, $fileName)
-    {
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . $fileName . '"');
-        header('Content-Length: ' . filesize($filePath));
-        readfile($filePath);
+        Response::send("Неизвестный тип ответа", 500);
     }
 }

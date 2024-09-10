@@ -22,7 +22,7 @@ class Router
         }
 
         if (isset($queryParams['action']) && !empty($queryParams['action'])) {
-            $action = '/' . $queryParams['action'];
+            $action = DIRECTORY_SEPARATOR . $queryParams['action'];
         } else {
             $action = $uriPath;
         }
