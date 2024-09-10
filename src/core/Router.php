@@ -14,25 +14,32 @@ class Router
     public function dispatch($uri)
     {
         $uriPath = strtok($uri, '?');
-        $queryString = parse_url($uri, PHP_URL_QUERY);
-
-        $queryParams = [];
-        if ($queryString !== null) {
-            parse_str($queryString, $queryParams);
-        }
-
-        if (isset($queryParams['action']) && !empty($queryParams['action'])) {
-            $action = DIRECTORY_SEPARATOR . $queryParams['action'];
-        } else {
-            $action = $uriPath;
-        }
+        $action = $this->getActionFromUri($uriPath, $this->getQueryParams($uri));
 
         if (isset($this->routes[$action])) {
             $handler = $this->routes[$action];
             return $handler();
-        } else {
-            http_response_code(404);
-            return;
         }
+
+        return null;
+    }
+
+    private function getQueryParams($uri)
+    {
+        $queryString = parse_url($uri, PHP_URL_QUERY);
+        $queryParams = [];
+
+        if ($queryString !== null) {
+            parse_str($queryString, $queryParams);
+        }
+
+        return $queryParams;
+    }
+    private function getActionFromUri($uriPath, $queryParams)
+    {
+        if (isset($queryParams['action']) && !empty($queryParams['action'])) {
+            return DIRECTORY_SEPARATOR . $queryParams['action'];
+        }
+        return $uriPath;
     }
 }
