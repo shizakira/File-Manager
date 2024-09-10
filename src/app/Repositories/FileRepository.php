@@ -28,7 +28,7 @@ class FileRepository implements FileRepositoryInterface
         $stmt = $this->executeQuery($sql);
         $results = $stmt->fetchAll();
 
-        return array_map([ModelFactory::class, 'createModelFromRow'], $results);
+        return array_map([ModelFactory::class, 'createModel'], $results);
     }
 
     public function getItemById($id)
@@ -38,7 +38,7 @@ class FileRepository implements FileRepositoryInterface
         $result = $stmt->fetch();
 
         if ($result) {
-            return ModelFactory::createModelFromRow($result);
+            return ModelFactory::createModel($result);
         }
 
         return null;

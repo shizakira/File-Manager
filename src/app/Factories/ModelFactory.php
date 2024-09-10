@@ -7,7 +7,7 @@ use App\Models\DirectoryModel;
 
 class ModelFactory
 {
-    public static function createModelFromRow($row)
+    public static function createModel($row)
     {
         if ($row['type'] === 'directory') {
             return new DirectoryModel($row['id'], $row['name'], $row['parent_id']);
