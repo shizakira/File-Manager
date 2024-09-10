@@ -4,6 +4,8 @@ namespace App\Repositories;
 
 use Core\Database;
 use App\Repositories\Interfaces\FileRepositoryInterface;
+use App\Models\FileModel;
+use App\Models\DirectoryModel;
 
 class FileRepository implements FileRepositoryInterface
 {
@@ -21,30 +23,49 @@ class FileRepository implements FileRepositoryInterface
         return $stmt;
     }
 
+    private function createModelFromRow($row)
+    {
+        if ($row['type'] === 'directory') {
+            return new DirectoryModel($row['id'], $row['name'], $row['parent_id']);
+        }
+
+        return new FileModel($row['id'], $row['name'], $row['parent_id']);
+    }
+
+
     public function getFiles()
     {
         $sql = "SELECT * FROM files";
         $stmt = $this->executeQuery($sql);
-        return $stmt->fetchAll();
+        $results = $stmt->fetchAll();
+
+        return array_map([$this, 'createModelFromRow'], $results);
     }
+
 
     public function getItemById($id)
     {
         $sql = "SELECT * FROM files WHERE id = :id";
         $stmt = $this->executeQuery($sql, ['id' => $id]);
-        return $stmt->fetch();
+        $result = $stmt->fetch();
+
+        if ($result) {
+            return $this->createModelFromRow($result);
+        }
+
+        return null;
     }
 
-    public function addDirectory($name, $parent_id)
+    public function addDirectory($name, $parentId)
     {
         $sql = "INSERT INTO files (name, type, parent_id) VALUES (:name, 'directory', :parent_id)";
-        $this->executeQuery($sql, ['name' => $name, 'parent_id' => $parent_id]);
+        $this->executeQuery($sql, ['name' => $name, 'parent_id' => $parentId]);
     }
 
-    public function uploadFile($name, $parent_id)
+    public function uploadFile($name, $parentId)
     {
         $sql = "INSERT INTO files (name, type, parent_id) VALUES (:name, 'file', :parent_id)";
-        $this->executeQuery($sql, ['name' => $name, 'parent_id' => $parent_id]);
+        $this->executeQuery($sql, ['name' => $name, 'parent_id' => $parentId]);
     }
 
     public function deleteItem($id)

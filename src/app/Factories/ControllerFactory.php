@@ -4,14 +4,14 @@ namespace App\Factories;
 
 use App\Controllers\FileController;
 use App\Services\FileService;
-use App\Services\FileManager;
+use App\Utils\FileManager;
 use App\Views\FileViewRenderer;
 use App\Repositories\FileRepository;
-use Core\Validator;
+use App\Validators\Validator;
 
 class ControllerFactory
 {
-    public function createFileController(): FileController
+    public function createFileController()
     {
         $validator = new Validator();
         $fileRepository = new FileRepository();

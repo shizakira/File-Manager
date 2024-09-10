@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Services;
+namespace App\Utils;
 
 class FileManager
 {
-    private const UPLOAD_PATH = '/uploads/';
+    private const UPLOAD_PATH = '/uploads';
 
     public function getUploadPath($parentPath = '')
     {
-        return $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . $parentPath;
+        return $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . DIRECTORY_SEPARATOR . $parentPath;
     }
 
     public function createDirectory($dirname, $parentPath)

@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use Core\Validator;
-
 class FileService
 {
     private $fileRepository;
@@ -26,7 +24,7 @@ class FileService
     public function addDirectory($dirname, $parentId)
     {
         if (!$this->validator->validateName($dirname)) {
-            return "Имя каталога не может превышать " . Validator::MAX_NAME_LENGTH . " символов.";
+            return "Имя каталога не может превышать " . $this->validator::MAX_NAME_LENGTH . " символов.";
         }
 
         $parentPath = $this->getParentPath($parentId);
@@ -42,15 +40,15 @@ class FileService
     public function uploadFile($fileName, $parentId, $tmpFilePath)
     {
         if (!$this->validator->validateFileSize($tmpFilePath)) {
-            return "Размер файла не должен превышать " . (Validator::MAX_FILE_SIZE / 1024 / 1024) . " МБ.";
+            return "Размер файла не должен превышать " . ($this->validator::MAX_FILE_SIZE / 1024 / 1024) . " МБ.";
         }
 
         if (!$this->validator->validateName($fileName)) {
-            return "Имя файла не может превышать " . Validator::MAX_NAME_LENGTH . " символов.";
+            return "Имя файла не может превышать " . $this->validator::MAX_NAME_LENGTH . " символов.";
         }
 
         if (!$this->validator->validateExtension($fileName)) {
-            return "Неверный формат файла. Разрешены только " . implode(', ', Validator::ALLOWED_EXTENSIONS);
+            return "Неверный формат файла. Разрешены только " . implode(', ', $this->validator::ALLOWED_EXTENSIONS);
         }
 
         $parentPath = $this->getParentPath($parentId);
@@ -72,13 +70,13 @@ class FileService
             return "Элемент не найден.";
         }
 
-        $itemPath = $this->fileManager->getUploadPath($this->getParentPath($item['parent_id'])) . $item['name'];
+        $itemPath = $this->fileManager->getUploadPath($this->getParentPath($item->getParentId())) . $item->getName();
 
-        if ($item['type'] === 'file') {
+        if ($item->getType() === 'file') {
             if (!$this->fileManager->deleteFile($itemPath)) {
                 return "Ошибка при удалении файла.";
             }
-        } elseif ($item['type'] === 'directory') {
+        } elseif ($item->getType() === 'directory') {
             $this->fileManager->deleteDirectoryRecursively($itemPath);
         }
 
@@ -86,6 +84,7 @@ class FileService
 
         return true;
     }
+
 
     private function getParentPath($parentId)
     {
@@ -99,8 +98,8 @@ class FileService
         while ($currentId !== null) {
             $parent = $this->fileRepository->getItemById($currentId);
             if ($parent) {
-                $path[] = $parent['name'] . '/';
-                $currentId = $parent['parent_id'];
+                $path[] = $parent->getName() . DIRECTORY_SEPARATOR;
+                $currentId = $parent->getParentId();
             } else {
                 break;
             }
@@ -109,15 +108,19 @@ class FileService
         return implode('', array_reverse($path));
     }
 
+
     private function buildTree($items, $parent_id = null)
     {
         $tree = [];
 
         foreach ($items as $item) {
-            if ($item['parent_id'] === $parent_id) {
-                $children = $this->buildTree($items, $item['id']);
+            $itemId = $item->getId();
+            $itemParentId = $item->getParentId();
+
+            if ($itemParentId === $parent_id) {
+                $children = $this->buildTree($items, $itemId);
                 if ($children) {
-                    $item['children'] = $children;
+                    $item->setChildren($children);
                 }
                 $tree[] = $item;
             }

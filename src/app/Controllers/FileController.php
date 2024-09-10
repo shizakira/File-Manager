@@ -2,19 +2,17 @@
 
 namespace App\Controllers;
 
-use App\Services\FileService;
-use App\Views\FileViewRenderer;
 use Core\Request;
 
 class FileController
 {
-    private FileService $fileService;
-    private FileViewRenderer $fileViewRenderer;
+    private $fileService;
+    private $fileViewRenderer;
 
     private const INDEX_VIEW_PATH = '/app/Views/index.php';
-    private const UPLOAD_PATH = '/uploads/';
+    private const UPLOAD_PATH = '/uploads';
 
-    public function __construct(FileService $fileService, FileViewRenderer $fileViewRenderer)
+    public function __construct($fileService, $fileViewRenderer)
     {
         $this->fileService = $fileService;
         $this->fileViewRenderer = $fileViewRenderer;
@@ -100,7 +98,7 @@ class FileController
             return "Ошибка: Имя файла не указано.";
         }
 
-        $filePath = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . basename($fileName);
+        $filePath = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . DIRECTORY_SEPARATOR . basename($fileName);
 
         if (!file_exists($filePath)) {
             http_response_code(404);
