@@ -5,29 +5,22 @@ namespace App\Services;
 class FileService
 {
     private $fileRepository;
-    private $validator;
     private $fileManager;
 
-    public function __construct($fileRepository, $validator, $fileManager)
+    public function __construct($fileRepository, $fileManager)
     {
         $this->fileRepository = $fileRepository;
-        $this->validator = $validator;
         $this->fileManager = $fileManager;
     }
 
     public function getFileTree()
     {
         $files = $this->fileRepository->getFiles();
-
         return $this->buildTree($files);
     }
 
     public function addDirectory($dirname, $parentId)
     {
-        if ($error = $this->validator->validateName($dirname)) {
-            return $error;
-        }
-
         $parentPath = $this->getParentPath($parentId);
 
         if (!$this->fileManager->createDirectory($dirname, $parentPath)) {
@@ -41,18 +34,6 @@ class FileService
 
     public function uploadFile($fileName, $parentId, $tmpFilePath)
     {
-        if ($error = $this->validator->validateFileSize($tmpFilePath)) {
-            return $error;
-        }
-
-        if ($error = $this->validator->validateName($fileName)) {
-            return $error;
-        }
-
-        if ($error = $this->validator->validateExtension($fileName)) {
-            return $error;
-        }
-
         $parentPath = $this->getParentPath($parentId);
         $uploadDir = $this->fileManager->getUploadPath($parentPath);
 

@@ -16,9 +16,9 @@ class ControllerFactory
         $validator = new FileValidator();
         $fileRepository = new FileRepository();
         $fileManager = new FileManager();
-        $fileService = new FileService($fileRepository, $validator, $fileManager);
+        $fileService = new FileService($fileRepository, $fileManager);
         $fileViewRenderer = new FileViewRenderer();
 
-        return new FileController($fileService, $fileViewRenderer);
+        return new FileController($fileService, $fileViewRenderer, $validator);
     }
 }

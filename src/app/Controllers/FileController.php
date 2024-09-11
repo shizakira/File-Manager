@@ -9,14 +9,16 @@ class FileController
 {
     private $fileService;
     private $fileViewRenderer;
+    private $validator;
 
     private const INDEX_VIEW_PATH = '/app/Views/index.php';
     private const UPLOAD_PATH = '/uploads';
 
-    public function __construct($fileService, $fileViewRenderer)
+    public function __construct($fileService, $fileViewRenderer, $validator)
     {
         $this->fileService = $fileService;
         $this->fileViewRenderer = $fileViewRenderer;
+        $this->validator = $validator;
     }
 
     public function index()
@@ -40,6 +42,10 @@ class FileController
             return Response::error("Имя каталога не указано.", 400);
         }
 
+        if ($error = $this->validator->validateName($dirname)) {
+            return Response::error($error, 400);
+        }
+
         $result = $this->fileService->addDirectory($dirname, $parentId);
 
         if ($result !== true) {
@@ -56,9 +62,22 @@ class FileController
         }
 
         $fileName = $_FILES['file']['name'];
+        $tmpFilePath = $_FILES['file']['tmp_name'];
         $parentId = Request::post('parent_id');
 
-        $result = $this->fileService->uploadFile($fileName, $parentId, $_FILES['file']['tmp_name']);
+        if ($error = $this->validator->validateFileSize($tmpFilePath)) {
+            return Response::error($error, 400);
+        }
+
+        if ($error = $this->validator->validateName($fileName)) {
+            return Response::error($error, 400);
+        }
+
+        if ($error = $this->validator->validateExtension($fileName)) {
+            return Response::error($error, 400);
+        }
+
+        $result = $this->fileService->uploadFile($fileName, $parentId, $tmpFilePath);
 
         if ($result !== true) {
             return Response::error($result, 400);
@@ -91,6 +110,7 @@ class FileController
         if (!$fileName) {
             return Response::error("Ошибка: Имя файла не указано.", 400);
         }
+
 
         $filePath = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . DIRECTORY_SEPARATOR . basename($fileName);
 
