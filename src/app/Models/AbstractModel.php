@@ -30,10 +30,5 @@ abstract class AbstractModel
         return $this->parentId;
     }
 
-    public function rename($newName)
-    {
-        $this->name = $newName;
-    }
-
     abstract public function getType();
 }

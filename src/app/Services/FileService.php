@@ -100,6 +100,7 @@ class FileService
 
         while ($currentId !== null) {
             $parent = $this->fileRepository->getItemById($currentId);
+
             if ($parent) {
                 $path[] = $parent->getName() . DIRECTORY_SEPARATOR;
                 $currentId = $parent->getParentId();
@@ -121,9 +122,11 @@ class FileService
 
             if ($itemParentId === $parent_id) {
                 $children = $this->buildTree($items, $itemId);
+
                 if ($children) {
                     $item->setChildren($children);
                 }
+
                 $tree[] = $item;
             }
         }
