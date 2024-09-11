@@ -16,7 +16,7 @@ class Router
         $uriPath = strtok($uri, '?');
         $action = $this->getActionFromUri($uriPath, $this->getQueryParams($uri));
 
-        if (isset($this->routes[$action])) {
+        if ($this->routes[$action]) {
             $handler = $this->routes[$action];
             return $handler();
         }

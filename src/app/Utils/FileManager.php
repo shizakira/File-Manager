@@ -10,7 +10,9 @@ class FileManager implements FileManagerInterface
 
     public function getUploadPath($parentPath = '')
     {
-        return $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . DIRECTORY_SEPARATOR . $parentPath;
+        $currentPath = self::UPLOAD_PATH . DIRECTORY_SEPARATOR . $parentPath;
+
+        return $_SERVER['DOCUMENT_ROOT'] . $currentPath;
     }
 
     public function createDirectory($dirname, $parentPath)

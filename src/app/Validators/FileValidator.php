@@ -12,18 +12,32 @@ class FileValidator implements FileValidatorInterface
 
     public function validateName($name)
     {
-        return mb_strlen($name) <= self::MAX_NAME_LENGTH;
+        if (mb_strlen($name) > self::MAX_NAME_LENGTH) {
+            return "Имя не может превышать " . self::MAX_NAME_LENGTH . " символов.";
+        }
+
+        return;
     }
 
     public function validateExtension($fileName)
     {
         $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        return in_array($extension, self::ALLOWED_EXTENSIONS, true);
+        if (!in_array($extension, self::ALLOWED_EXTENSIONS, true)) {
+            $allowedExtensions = implode(', ', self::ALLOWED_EXTENSIONS);
+            return "Неверный формат файла. Разрешены только " . $allowedExtensions;
+        }
+
+        return;
     }
 
     public function validateFileSize($tmpFilePath)
     {
         $fileSize = filesize($tmpFilePath);
-        return $fileSize <= self::MAX_FILE_SIZE;
+        if ($fileSize > self::MAX_FILE_SIZE) {
+            $maxFileSize = self::MAX_FILE_SIZE / 1024 / 1024;
+            return "Размер файла не должен превышать " . $maxFileSize . " МБ.";
+        }
+
+        return;
     }
 }

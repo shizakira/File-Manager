@@ -8,7 +8,7 @@ class FileService
     private $validator;
     private $fileManager;
 
-    public function __construct($fileRepository,  $validator, $fileManager)
+    public function __construct($fileRepository, $validator, $fileManager)
     {
         $this->fileRepository = $fileRepository;
         $this->validator = $validator;
@@ -18,13 +18,14 @@ class FileService
     public function getFileTree()
     {
         $files = $this->fileRepository->getFiles();
+
         return $this->buildTree($files);
     }
 
     public function addDirectory($dirname, $parentId)
     {
-        if (!$this->validator->validateName($dirname)) {
-            return "Имя каталога не может превышать " . $this->validator::MAX_NAME_LENGTH . " символов.";
+        if ($error = $this->validator->validateName($dirname)) {
+            return $error;
         }
 
         $parentPath = $this->getParentPath($parentId);
@@ -34,21 +35,22 @@ class FileService
         }
 
         $this->fileRepository->addDirectory($dirname, $parentId);
+
         return true;
     }
 
     public function uploadFile($fileName, $parentId, $tmpFilePath)
     {
-        if (!$this->validator->validateFileSize($tmpFilePath)) {
-            return "Размер файла не должен превышать " . ($this->validator::MAX_FILE_SIZE / 1024 / 1024) . " МБ.";
+        if ($error = $this->validator->validateFileSize($tmpFilePath)) {
+            return $error;
         }
 
-        if (!$this->validator->validateName($fileName)) {
-            return "Имя файла не может превышать " . $this->validator::MAX_NAME_LENGTH . " символов.";
+        if ($error = $this->validator->validateName($fileName)) {
+            return $error;
         }
 
-        if (!$this->validator->validateExtension($fileName)) {
-            return "Неверный формат файла. Разрешены только " . implode(', ', $this->validator::ALLOWED_EXTENSIONS);
+        if ($error = $this->validator->validateExtension($fileName)) {
+            return $error;
         }
 
         $parentPath = $this->getParentPath($parentId);
@@ -59,6 +61,7 @@ class FileService
         }
 
         $this->fileRepository->uploadFile($fileName, $parentId);
+
         return true;
     }
 
@@ -70,7 +73,8 @@ class FileService
             return "Элемент не найден.";
         }
 
-        $itemPath = $this->fileManager->getUploadPath($this->getParentPath($item->getParentId())) . $item->getName();
+        $parentPath = $this->getParentPath($item->getParentId());
+        $itemPath = $this->fileManager->getUploadPath($parentPath) . $item->getName();
 
         if ($item->getType() === 'file') {
             if (!$this->fileManager->deleteFile($itemPath)) {
@@ -123,6 +127,7 @@ class FileService
                 $tree[] = $item;
             }
         }
+
         return $tree;
     }
 }
