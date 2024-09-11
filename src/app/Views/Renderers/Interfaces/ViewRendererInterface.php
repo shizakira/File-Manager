@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Views\Interfaces;
+namespace App\Views\Renderers\Interfaces;
 
 interface ViewRendererInterface
 {

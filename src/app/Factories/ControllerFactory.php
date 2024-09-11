@@ -5,7 +5,7 @@ namespace App\Factories;
 use App\Controllers\FileController;
 use App\Services\FileService;
 use App\Utils\FileManager;
-use App\Views\FileViewRenderer;
+use App\Views\Renderers\FileViewRenderer;
 use App\Repositories\FileRepository;
 use App\Validators\FileValidator;
 
