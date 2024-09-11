@@ -8,7 +8,7 @@ class FileService
     private $validator;
     private $fileManager;
 
-    public function __construct($fileRepository, $validator, $fileManager)
+    public function __construct($fileRepository,  $validator, $fileManager)
     {
         $this->fileRepository = $fileRepository;
         $this->validator = $validator;
@@ -85,7 +85,6 @@ class FileService
         return true;
     }
 
-
     private function getParentPath($parentId)
     {
         if ($parentId === null) {
@@ -107,7 +106,6 @@ class FileService
 
         return implode('', array_reverse($path));
     }
-
 
     private function buildTree($items, $parent_id = null)
     {

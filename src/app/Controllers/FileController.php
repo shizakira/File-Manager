@@ -23,7 +23,6 @@ class FileController
     {
         $filesTree = $this->fileService->getFileTree();
         $treeHtml = $this->fileViewRenderer->renderTree($filesTree);
-
         return [
             'view' => $_SERVER['DOCUMENT_ROOT'] . self::INDEX_VIEW_PATH,
             'data' => compact('treeHtml')

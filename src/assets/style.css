@@ -216,6 +216,7 @@ li[data-type="file"]::before {
     main{
         flex-direction: column;
         gap: 30px;
+        height: 100%;
     }
     
 }

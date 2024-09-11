@@ -7,13 +7,13 @@ use App\Services\FileService;
 use App\Utils\FileManager;
 use App\Views\FileViewRenderer;
 use App\Repositories\FileRepository;
-use App\Validators\Validator;
+use App\Validators\FileValidator;
 
 class ControllerFactory
 {
     public function createFileController()
     {
-        $validator = new Validator();
+        $validator = new FileValidator();
         $fileRepository = new FileRepository();
         $fileManager = new FileManager();
         $fileService = new FileService($fileRepository, $validator, $fileManager);

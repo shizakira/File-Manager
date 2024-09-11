@@ -2,7 +2,9 @@
 
 namespace App\Utils;
 
-class FileManager
+use App\Utils\Interfaces\FileManagerInterface;
+
+class FileManager implements FileManagerInterface
 {
     private const UPLOAD_PATH = '/uploads';
 

@@ -2,7 +2,9 @@
 
 namespace App\Validators;
 
-class Validator
+use App\Validators\Interfaces\FileValidatorInterface;
+
+class FileValidator implements FileValidatorInterface
 {
     public const MAX_NAME_LENGTH = 255;
     public const MAX_FILE_SIZE = 1024 * 1024 * 20;
