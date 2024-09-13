@@ -1,138 +1,97 @@
-document.addEventListener("DOMContentLoaded", () => {
-    initializeFileTree();
-    updateButtonStates();
+const fileStructure = document.querySelector("#file-structure");
+const directoryNameInput = document.querySelector("#directory-name");
+const allButtons = document.querySelectorAll("button");
+const btnAddFolder = document.querySelector("#add-folder-btn");
+const btnAddFile = document.querySelector("#add-file-btn");
+const btnDelete = document.querySelector("#delete-btn");
+const btnDownload = document.querySelector("#download-btn");
+const chosenPath = document.querySelector(".content__path");
+const uploadInput = document.querySelector("#file-upload");
 
-    const directoryNameInput = document.querySelector("#directory-name");
-    const fileUploadInput = document.querySelector("#file-upload");
-    const downloadBtn = document.querySelector("#download-btn");
-    const addFolderBtn = document.querySelector("#add-folder-btn");
-    const addFileBtn = document.querySelector("#add-file-btn");
-    const deleteBtn = document.querySelector("#delete-btn");
+let selectedElem;
 
-    directoryNameInput.addEventListener("input", updateButtonStates);
-    fileUploadInput.addEventListener("change", uploadFile);
-    downloadBtn.addEventListener("click", downloadFile);
-
-    addFolderBtn.addEventListener("click", addDirectory);
-    addFileBtn.addEventListener("click", () => fileUploadInput.click());
-    deleteBtn.addEventListener("click", deleteItem);
-});
-
-function initializeFileTree() {
-    const fileItems = document.querySelectorAll("#file-structure li");
-    const controlForm = document.querySelector("#control-form");
-    const selectedFile = document.querySelector("#selected-file");
-
-    if (fileItems.length === 0) {
-        selectedFile.textContent = "Корневой каталог";
-        controlForm.dataset.selectedId = null;
-        controlForm.dataset.selectedType = "directory";
-    } else {
-        fileItems.forEach((li) => {
-            li.addEventListener("click", (event) => {
-                handleFileSelection(event, li);
-            });
-        });
-    }
-}
-
-function handleFileSelection(event, li) {
-    event.stopPropagation();
-
-    document.querySelectorAll("#file-structure li").forEach((item) => {
-        item.classList.remove("selected");
-    });
-
-    li.classList.add("selected");
-
-    const selectedId = li.getAttribute("data-id");
-    const selectedType = li.getAttribute("data-type");
-    const selectedText = li.childNodes[0].nodeValue.trim();
-
-    document.querySelector("#selected-file").textContent = buildFullPath(li);
-    const controlForm = document.querySelector("#control-form");
-    controlForm.dataset.selectedId = selectedId;
-    controlForm.dataset.selectedType = selectedType;
-
-    const directoryNameInput = document.querySelector("#directory-name");
-    directoryNameInput.disabled = selectedType === "file";
-
-    const managmentInput = document.querySelector(".managment__input");
-
-    if (selectedType === "file") {
-        managmentInput.value = "";
-    }
-
-    if (selectedType === "file" && isImageFile(selectedText)) {
-        displayImage(selectedText);
-    } else {
-        displayDefaultImage();
-    }
-
-    updateButtonStates();
-}
-
-function buildFullPath(element) {
-    let path = element.childNodes[0].nodeValue.trim();
-    let parent = element.parentElement.closest("li");
-
-    while (parent) {
-        path = `${parent.childNodes[0].nodeValue.trim()}/${path}`;
-        parent = parent.parentElement.closest("li");
-    }
-
-    return `${path}${
-        element.getAttribute("data-type") === "directory" ? "/" : ""
-    }`;
+function updateElementStates(event) {
+    selectedElem?.classList?.remove("selected");
+    selectedElem = event.target;
+    selectedElem.classList.add("selected");
 }
 
 function updateButtonStates() {
-    const dirname = document.querySelector("#directory-name").value.trim();
-    const selectedType =
-        document.querySelector("#control-form").dataset.selectedType || "";
-    const selectedId =
-        document.querySelector("#control-form").dataset.selectedId || null;
+    const isDirectory = selectedElem?.dataset.type === "directory";
+    const isFile = selectedElem?.dataset.type === "file";
+    const isInputValue = directoryNameInput.value === "";
+    const root = !isDirectory && !isFile;
 
-    const addFolderBtn = document.querySelector("#add-folder-btn");
-    const addFileBtn = document.querySelector("#add-file-btn");
-    const deleteBtn = document.querySelector("#delete-btn");
-    const downloadBtn = document.querySelector("#download-btn");
+    if (root) {
+        directoryNameInput.disabled = false;
+        btnAddFolder.disabled = isInputValue;
+    } else {
+        btnAddFolder.disabled = !selectedElem || isFile || isInputValue;
+        btnAddFile.disabled = !isDirectory;
+        directoryNameInput.disabled = !isDirectory;
+        btnDelete.disabled = !selectedElem;
+        btnDownload.disabled = !isFile;
 
-    addFolderBtn.disabled = !(dirname && selectedType !== "file");
-    addFileBtn.disabled = selectedType !== "directory";
-    deleteBtn.disabled = !selectedId;
-    downloadBtn.disabled = selectedType !== "file";
+        directoryNameInput.value = isFile ? "" : directoryNameInput.value;
+    }
 }
 
-function isImageFile(fileName) {
-    const imageExtensions = [".jpg", ".jpeg", ".png", ".gif"];
-    return imageExtensions.includes(
-        fileName.slice(fileName.lastIndexOf(".")).toLowerCase()
-    );
+function updateChosenPath() {
+    chosenPath.textContent = getFullPath(selectedElem);
 }
 
-function displayImage(fileName) {
-    const selectedFilePath = document
-        .querySelector("#selected-file")
-        .textContent.trim();
-    const imageContainer = document.querySelector("#image-preview");
+function getFullPath(elem) {
+    let fullPath = [];
 
-    imageContainer.innerHTML = `<img src="uploads/${selectedFilePath}" alt="Image">`;
-    imageContainer.style.display = "block";
+    while (elem && elem !== fileStructure) {
+        if (elem.tagName === "LI") {
+            fullPath.unshift(elem.firstChild.nodeValue.trim());
+        }
+
+        elem = elem.parentElement;
+    }
+
+    return fullPath.join("/");
 }
 
-function displayDefaultImage() {
-    const imageContainer = document.querySelector("#image-preview");
-    imageContainer.innerHTML = `<img src="assets/img/no-photo.png" alt="No Image">`;
-    imageContainer.style.display = "block";
+function displayImage(event) {
+    const fileType = event.target.dataset.type;
+    const fileName = event.target.textContent.trim();
+    const imagePreview = document.querySelector("#image-preview img");
+    const defaultImage = "assets/img/no-photo.png";
+    const isImageFile = /\.(jpg|jpeg|png|gif)$/i.test(fileName);
+
+    if (fileType !== "file" || !isImageFile) {
+        imagePreview.src = defaultImage;
+        return;
+    }
+
+    imagePreview.src = `uploads/${getFullPath(event.target)}`;
+}
+
+async function downloadFile() {
+    const selectedFilePath = getFullPath(selectedElem);
+
+    try {
+        const response = await fetch(`uploads/${selectedFilePath}`);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+
+        a.href = url;
+        a.download = selectedFilePath;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        alert(error);
+    }
 }
 
 async function addDirectory() {
-    const dirname = document.querySelector("#directory-name").value.trim();
-    const parentId =
-        document.querySelector("#control-form").dataset.selectedId || null;
-
-    if (!dirname) return;
+    const dirname = directoryNameInput.value.trim();
+    const parentId = selectedElem?.dataset.id || null;
 
     try {
         const response = await fetch("index.php?action=add_directory", {
@@ -144,34 +103,23 @@ async function addDirectory() {
         });
 
         const data = await response.text();
-        if (response.ok) {
-            if (data.includes("Каталог добавлен")) {
-                location.reload();
-            }
-        } else {
-            alert(`Ошибка: ${data}`);
-        }
+
+        response.ok ? location.reload() : alert(data);
     } catch (error) {
-        alert("Ошибка при добавлении каталога:", error);
+        alert(error);
     }
 }
 
 async function uploadFile() {
-    const form = document.querySelector("#control-form");
-    const parentId = form.dataset.selectedId || null;
+    const parentId = selectedElem?.dataset.id || null;
 
-    if (!parentId) return;
+    const file = uploadInput.files[0];
+    const formData = new FormData();
 
-    const fileInput = document.querySelector("#file-upload");
-    const file = fileInput.files[0];
-
-    if (!file) return;
+    formData.append("file", file);
+    formData.append("parent_id", parentId);
 
     try {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("parent_id", parentId);
-
         const response = await fetch("index.php?action=upload_file", {
             method: "POST",
             body: formData,
@@ -179,61 +127,48 @@ async function uploadFile() {
 
         const data = await response.text();
 
-        if (response.ok) {
-            if (data.includes("Файл успешно загружен")) {
-                location.reload();
-            }
-        } else {
-            alert(`Ошибка: ${data}`);
-        }
+        response.ok ? location.reload() : alert(data);
     } catch (error) {
-        alert("Произошла ошибка во время загрузки файла.");
+        alert(error);
     }
 }
 
-async function deleteItem() {
-    const itemId = document.querySelector("#control-form").dataset.selectedId;
-
-    if (!itemId) return;
-
+async function deleteElement() {
     try {
         const response = await fetch("index.php?action=delete_item", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: new URLSearchParams({ id: itemId }),
+            body: new URLSearchParams({ id: selectedElem?.dataset.id }),
         });
 
         const data = await response.text();
 
-        if (response.ok) {
-            if (data.includes("Элемент удален")) {
-                location.reload();
-            }
-        } else {
-            alert(`Ошибка: ${data}`);
-        }
+        response.ok ? location.reload() : alert(data);
     } catch (error) {
-        alert("Ошибка при удалении элемента:", error);
+        alert(error);
     }
 }
 
-function downloadFile() {
-    const selectedText = document
-        .querySelector("#selected-file")
-        .textContent.trim();
-    const selectedType =
-        document.querySelector("#control-form").dataset.selectedType;
+document.addEventListener("DOMContentLoaded", () => {
+    allButtons.forEach((button) => {
+        button.disabled = true;
+    });
 
-    if (selectedType === "file") {
-        const downloadLink = document.createElement("a");
-        downloadLink.href = `/uploads/${encodeURIComponent(selectedText)}`;
-        downloadLink.download = selectedText.substring(
-            selectedText.lastIndexOf("/") + 1
-        );
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-    }
-}
+    selectedElem = null;
+});
+
+fileStructure.addEventListener("click", (event) => {
+    displayImage(event);
+    updateElementStates(event);
+    updateButtonStates();
+    updateChosenPath();
+});
+
+directoryNameInput.addEventListener("input", updateButtonStates);
+uploadInput.addEventListener("change", uploadFile);
+btnAddFolder.addEventListener("click", addDirectory);
+btnAddFile.addEventListener("click", () => uploadInput.click());
+btnDelete.addEventListener("click", deleteElement);
+btnDownload.addEventListener("click", downloadFile);
