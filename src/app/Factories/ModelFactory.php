@@ -9,10 +9,12 @@ class ModelFactory
 {
     public static function createModel($row)
     {
-        if ($row['type'] === 'directory') {
-            return new DirectoryModel($row['id'], $row['name'], $row['parent_id']);
-        }
+        $map = [
+            'file' => FileModel::class,
+            'directory' => DirectoryModel::class
+        ];
 
-        return new FileModel($row['id'], $row['name'], $row['parent_id']);
+        $class = $map[$row['type']] ?? FileModel::class;
+        return new $class($row['id'], $row['name'], $row['parent_id']);
     }
 }

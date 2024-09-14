@@ -7,6 +7,7 @@
     },
     "require": {
         "symfony/var-dumper": "^7.1",
-        "vlucas/phpdotenv": "^5.6"
+        "vlucas/phpdotenv": "^5.6",
+        "php-di/php-di": "^6.3"
     }
 }

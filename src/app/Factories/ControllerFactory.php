@@ -4,21 +4,27 @@ namespace App\Factories;
 
 use App\Controllers\FileController;
 use App\Services\FileService;
-use App\Utils\FileManager;
 use App\Views\Renderers\FileViewRenderer;
-use App\Repositories\FileRepository;
 use App\Validators\FileValidator;
 
 class ControllerFactory
 {
+    protected $fileService;
+    protected $fileViewRenderer;
+    protected $fileValidator;
+
+    public function __construct(
+        FileService $fileService,
+        FileViewRenderer $fileViewRenderer,
+        FileValidator $fileValidator
+    ) {
+        $this->fileService = $fileService;
+        $this->fileViewRenderer = $fileViewRenderer;
+        $this->fileValidator = $fileValidator;
+    }
+
     public function createFileController()
     {
-        $validator = new FileValidator();
-        $fileRepository = new FileRepository();
-        $fileManager = new FileManager();
-        $fileService = new FileService($fileRepository, $fileManager);
-        $fileViewRenderer = new FileViewRenderer();
-
-        return new FileController($fileService, $fileViewRenderer, $validator);
+        return new FileController($this->fileService, $this->fileViewRenderer, $this->fileValidator);
     }
 }

@@ -2,8 +2,6 @@
 
 namespace App;
 
-use App\Factories\ControllerFactory;
-use Core\Router;
 use Core\Config;
 use Core\Response;
 
