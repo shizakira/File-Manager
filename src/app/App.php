@@ -13,7 +13,7 @@ class App
     private $controllerFactory;
     private $config;
 
-    public function __construct(Router $router, ControllerFactory $controllerFactory)
+    public function __construct($router, $controllerFactory)
     {
         $this->config = Config::getInstance();
         $this->router = $router;
@@ -23,6 +23,8 @@ class App
 
     private function initializeRoutes()
     {
+        $controller = $this->controllerFactory->createFileController();
+
         $routes = [
             'ROUTE_INDEX' => 'index',
             'ROUTE_ADD_DIRECTORY' => 'addDirectory',
@@ -32,8 +34,7 @@ class App
         ];
 
         foreach ($routes as $envKey => $method) {
-            $this->router->add($this->config->getEnv($envKey), function () use ($method) {
-                $controller = $this->controllerFactory->createFileController();
+            $this->router->add($this->config->getEnv($envKey), function () use ($controller, $method) {
                 return $controller->$method();
             });
         }
@@ -46,9 +47,8 @@ class App
 
         match ($responseType) {
             'view' => Response::render($response['view'], $response['data']),
-            'file' => Response::download($response['filePath'], $response['fileName']),
-            'message' => Response::send($response['message'], $response['statusCode']),
-            'error' => Response::send($response['error'], $response['statusCode']),
+            'file' => Response::download($response['filePath']),
+            'message', 'error' => Response::sendJson($response, $response['statusCode']),
             default => $this->handleUnknownResponseType(),
         };
     }
@@ -66,6 +66,6 @@ class App
 
     private function handleUnknownResponseType()
     {
-        Response::send("Неизвестный тип ответа", 500);
+        Response::sendJson(["error" => "Неизвестный тип ответа"], 500);
     }
 }

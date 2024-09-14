@@ -37,7 +37,7 @@
         <div class="content">
             <div class="content__wrapper">
                 <div class="content__choused">
-                    <p class="content__title">Выбрано:</p>
+                    <p class="content__title">Выбрано: <span class="content__path"></span></p>
                     <span id="selected-file" class="content__current-folder"></span>
                 </div>
                 <button id="download-btn" class="btn" type="button" disabled>

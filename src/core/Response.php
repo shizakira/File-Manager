@@ -4,10 +4,10 @@ namespace Core;
 
 class Response
 {
-    public static function send($content, $statusCode = 200)
+    public static function sendJson($content, $statusCode = 200)
     {
         http_response_code($statusCode);
-        echo $content;
+        echo json_encode($content);
     }
 
     public static function render($viewPath, $data = [])
@@ -16,20 +16,9 @@ class Response
         include($viewPath);
     }
 
-    public static function download($filePath, $fileName)
+    public static function download($filePath)
     {
-        if (file_exists($filePath)) {
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="' . basename($fileName) . '"');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header('Content-Length: ' . filesize($filePath));
-            readfile($filePath);
-        } else {
-            self::send("Файл не найден", 404);
-        }
+        file_exists($filePath) ? readfile($filePath) : self::sendJson(["error" => "Файл не найден"], 404);
     }
 
     public static function success($message, $statusCode = 200)

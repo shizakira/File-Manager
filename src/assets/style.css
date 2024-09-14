@@ -159,6 +159,10 @@ li[data-type="file"]::before {
     padding-bottom: 10px;
 }
 
+.content__path{
+    color: blue;
+}
+
 .content__wrapper{
     display: flex;
     justify-content: space-between;

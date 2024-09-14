@@ -77,9 +77,10 @@ async function downloadFile() {
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
+        const fileName = selectedFilePath.split("/").pop();
 
         a.href = url;
-        a.download = selectedFilePath;
+        a.download = fileName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -97,14 +98,14 @@ async function addDirectory() {
         const response = await fetch("index.php?action=add_directory", {
             method: "POST",
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
+                "Content-Type": "application/json",
             },
-            body: new URLSearchParams({ dirname, parent_id: parentId }),
+            body: JSON.stringify({ dirname, parent_id: parentId }),
         });
 
-        const data = await response.text();
+        const data = await response.json();
 
-        response.ok ? location.reload() : alert(data);
+        response.ok ? location.reload() : alert(data.error);
     } catch (error) {
         alert(error);
     }
@@ -125,9 +126,9 @@ async function uploadFile() {
             body: formData,
         });
 
-        const data = await response.text();
+        const data = await response.json();
 
-        response.ok ? location.reload() : alert(data);
+        response.ok ? location.reload() : alert(data.error);
     } catch (error) {
         alert(error);
     }
@@ -138,12 +139,12 @@ async function deleteElement() {
         const response = await fetch("index.php?action=delete_item", {
             method: "POST",
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
+                "Content-Type": "application/json",
             },
-            body: new URLSearchParams({ id: selectedElem?.dataset.id }),
+            body: JSON.stringify({ id: selectedElem?.dataset.id }),
         });
 
-        const data = await response.text();
+        const data = await response.json();
 
         response.ok ? location.reload() : alert(data);
     } catch (error) {

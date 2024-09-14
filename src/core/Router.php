@@ -21,7 +21,7 @@ class Router
             return $handler();
         }
 
-        return null;
+        return;
     }
 
     private function getQueryParams($uri)
