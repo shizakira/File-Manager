@@ -1,19 +1,17 @@
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-
-img{
+img {
     display: block;
     width: 100%;
-    max-height: 763px ;
-    object-fit: contain; 
+    max-height: 763px;
+    object-fit: contain;
 }
 
-
-main{
+main {
     margin: 30px auto 0;
     display: flex;
     justify-content: center;
@@ -27,70 +25,68 @@ ul {
     list-style-type: none;
 }
 
-.files > ul{
+.files > ul {
     padding-left: 0;
 }
 
 li {
-    list-style-type: none; 
+    list-style-type: none;
     margin-top: 6px;
-    color:#797576;
+    color: #797576;
     word-break: break-all;
 }
 
-
-li[data-type="directory"].selected::before {
-    content: url('img/blue-folder.png'); 
-    margin-right: 5px; 
+li[data-type="directory"].files__item_selected::before {
+    content: url('img/blue-folder.png');
+    margin-right: 5px;
 }
 
-li[data-type="file"].selected::before {
-    content: url('img/blue-file.png'); 
+li[data-type="file"].files__item_selected::before {
+    content: url('img/blue-file.png');
     margin-right: 5px;
 }
 
 li[data-type="directory"]::before {
-    content: url('img/folder.png'); 
-    margin-right: 5px; 
-}
-
-li[data-type="file"]::before {
-    content: url('img/file.png'); 
+    content: url('img/folder.png');
     margin-right: 5px;
 }
 
-.selected {
-    color: blue; 
+li[data-type="file"]::before {
+    content: url('img/file.png');
+    margin-right: 5px;
 }
 
-.managment, .content{
+.files__item_selected {
+    color: blue;
+}
+
+.management, .content {
     max-height: 894px;
 }
 
-.managment{
+.management {
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 2px;
     max-width: 868px;
     padding: 18px;
-
     display: flex;
     flex-direction: column;
     gap: 12px;
-}   
+}
 
-.managment__form{
+.management__form {
     display: flex;
     align-items: end;
     gap: 12px;
 }
 
-.managment__input-wrapper{
+.management__input-wrapper {
     display: flex;
     gap: 8px;
     flex-direction: column;
 }
 
-.managment__input{
+.management__input {
     border: 1px solid #D9D9D9;
     border-radius: 8px;
     resize: none;
@@ -98,36 +94,29 @@ li[data-type="file"]::before {
     height: 40px;
 }
 
-.btn{
+.btn {
     position: relative;
     width: 134px;
     height: 40px;
-
     background: #B5B5B5;
     border: 1px solid #2C2C2C;
-
     border-radius: 8px;
-
     cursor: pointer;
-
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 4px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 8px;
 }
 
-.btn__text{
+.btn__text {
     position: relative;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); 
-
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     font-family: 'Inter';
     font-style: normal;
     font-weight: 400;
     font-size: 16px;
     line-height: 100%;
-
     color: #F5F5F5;
 }
 
-.content__current-folder{
+.content__current-folder {
     color: blue;
 }
 
@@ -139,19 +128,17 @@ li[data-type="file"]::before {
     cursor: not-allowed;
 }
 
-.content{
+.content {
     width: 868px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 2px;
-
     padding: 18px;
-
     display: flex;
     flex-direction: column;
     gap: 36px;
 }
 
-.content__choused{
+.content__chosen {
     display: flex;
     align-items: center;
     gap: 20px;
@@ -159,11 +146,12 @@ li[data-type="file"]::before {
     padding-bottom: 10px;
 }
 
-.content__path{
+.content__path {
+    word-break: break-word;
     color: blue;
 }
 
-.content__wrapper{
+.content__wrapper {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -171,65 +159,58 @@ li[data-type="file"]::before {
     gap: 10px;
 }
 
-.content__image{
+.content__image {
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.btn-wrapper{
+.btn-wrapper {
     display: flex;
     gap: 10px;
 }
 
-.content__current-folder{
-    word-break: break-all;
-}
 
 @media (max-width: 1550px) {
-    .managment__form{
+    .management__form {
         flex-direction: column;
     }
 
-    .managment__input-wrapper, .managment__input{
+    .management__input-wrapper, .management__input {
         width: 100%;
     }
 }
 
 @media (max-width: 1000px) {
-    .managment{
+    .management {
         max-width: none;
     }
 
-    .managment, .content{
+    .management, .content {
         height: 50%;
         width: 100%;
     }
 
-    .managment__input-wrapper, .btn-wrapper{
+    .management__input-wrapper, .btn-wrapper {
         max-width: 100%;
     }
 
-    .managment__form{
-        flex-direction: row ;
+    .management__form {
+        flex-direction: row;
         flex-wrap: wrap;
-
     }
 
-    main{
+    main {
         flex-direction: column;
         gap: 30px;
         height: 100%;
     }
-    
 }
 
 @media (max-width: 600px) {
-    .content__image{
+    .content__image {
         justify-content: flex-start;
         align-items: flex-start;
     }
-
 }
-

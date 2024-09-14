@@ -10,12 +10,12 @@
 
 <body>
     <main class="main">
-        <div class="managment">
-            <form id="control-form" class="managment__form" enctype="multipart/form-data" action="index.php" method="post">
-                <input type="hidden" name="action" value="">
-                <div class="managment__input-wrapper">
-                    <label for="input" class="managment__input-label">Наименование директории</label>
-                    <input class="managment__input" id="directory-name" name="dirname" autocomplete="off">
+        <div class="management">
+            <form class="management__form" enctype="multipart/form-data" method="post">
+                <input class="management__hidden-input" type="hidden" name="action" value="">
+                <div class="management__input-wrapper">
+                    <label for="input" class="management__input-label">Наименование директории</label>
+                    <input class="management__input" id="directory-name" name="dirname" autocomplete="off">
                 </div>
                 <div class="btn-wrapper">
                     <button class="btn" id="add-folder-btn" type="button" disabled>
@@ -30,15 +30,14 @@
                     </button>
                 </div>
             </form>
-            <div class="files" id="file-structure">
+            <div class="files">
                 <?= $treeHtml ?>
             </div>
         </div>
         <div class="content">
             <div class="content__wrapper">
-                <div class="content__choused">
+                <div class="content__chosen">
                     <p class="content__title">Выбрано: <span class="content__path"></span></p>
-                    <span id="selected-file" class="content__current-folder"></span>
                 </div>
                 <button id="download-btn" class="btn" type="button" disabled>
                     <span class="btn__text">Скачать</span>

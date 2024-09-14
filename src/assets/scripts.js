@@ -1,4 +1,4 @@
-const fileStructure = document.querySelector("#file-structure");
+const fileStructure = document.querySelector(".files");
 const directoryNameInput = document.querySelector("#directory-name");
 const allButtons = document.querySelectorAll("button");
 const btnAddFolder = document.querySelector("#add-folder-btn");
@@ -11,9 +11,9 @@ const uploadInput = document.querySelector("#file-upload");
 let selectedElem;
 
 function updateElementStates(event) {
-    selectedElem?.classList?.remove("selected");
+    selectedElem?.classList?.remove("files__item_selected");
     selectedElem = event.target;
-    selectedElem.classList.add("selected");
+    selectedElem.classList.add("files__item_selected");
 }
 
 function updateButtonStates() {
