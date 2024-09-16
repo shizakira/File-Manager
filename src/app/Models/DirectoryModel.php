@@ -6,19 +6,19 @@ use App\Models\AbstractModel;
 
 class DirectoryModel extends AbstractModel
 {
-    private $children = [];
+    private array $children = [];
 
-    public function getType()
+    public function getType(): string
     {
         return 'directory';
     }
 
-    public function getChildren()
+    public function getChildren(): array
     {
         return $this->children;
     }
 
-    public function setChildren($children)
+    public function setChildren($children): void
     {
         $this->children = $children;
     }

@@ -4,9 +4,9 @@ namespace App\Utils\Interfaces;
 
 interface FileManagerInterface
 {
-    public function createDirectory($dirname, $parentPath);
-    public function moveUploadedFile($tmpFilePath, $uploadDir, $fileName);
-    public function deleteFile($filePath);
-    public function deleteDirectoryRecursively($directory);
-    public function getUploadPath($parentPath = '');
+    public function createDirectory(string $dirname, string $parentPath);
+    public function moveUploadedFile(string $tmpFilePath, string $uploadDir, string $fileName);
+    public function deleteFile(string $filePath);
+    public function deleteDirectoryRecursively(string $directory);
+    public function getUploadPath(string $parentPath = '');
 }

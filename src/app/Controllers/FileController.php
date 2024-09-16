@@ -7,31 +7,27 @@ use Core\Response;
 
 class FileController
 {
-    private $fileService;
-    private $fileViewRenderer;
-    private $validator;
-
     private const INDEX_VIEW_PATH = '/app/Views/index.php';
     private const UPLOAD_PATH = '/uploads';
 
-    public function __construct($fileService, $fileViewRenderer, $validator)
-    {
-        $this->fileService = $fileService;
-        $this->fileViewRenderer = $fileViewRenderer;
-        $this->validator = $validator;
-    }
+    public function __construct(
+        private object $fileService,
+        private object $fileViewRenderer,
+        private object $validator
+    ) {}
 
-    public function index()
+    public function index(): array
     {
         $filesTree = $this->fileService->getFileTree();
         $treeHtml = $this->fileViewRenderer->renderTree($filesTree);
+
         return [
             'view' => $_SERVER['DOCUMENT_ROOT'] . self::INDEX_VIEW_PATH,
             'data' => compact('treeHtml')
         ];
     }
 
-    public function addDirectory()
+    public function addDirectory(): array
     {
         $dirname = Request::post('dirname');
         $parentIdInput = Request::post('parent_id');
@@ -55,7 +51,7 @@ class FileController
         return Response::success("Каталог добавлен");
     }
 
-    public function uploadFile()
+    public function uploadFile(): array
     {
         if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
             return Response::error("Файл не загружен", 400);
@@ -63,6 +59,7 @@ class FileController
 
         $fileName = $_FILES['file']['name'];
         $tmpFilePath = $_FILES['file']['tmp_name'];
+
         $parentId = Request::post('parent_id');
 
         if ($error = $this->validator->validateFileSize($tmpFilePath)) {
@@ -86,7 +83,7 @@ class FileController
         return Response::success("Файл успешно загружен");
     }
 
-    public function deleteItem()
+    public function deleteItem(): array
     {
         $id = Request::post('id');
 
@@ -103,14 +100,13 @@ class FileController
         return Response::success("Элемент удален");
     }
 
-    public function download()
+    public function download(): array
     {
         $fileName = Request::get('filename');
 
         if (!$fileName) {
             return Response::error("Ошибка: Имя файла не указано.", 400);
         }
-
 
         $filePath = $_SERVER['DOCUMENT_ROOT'] . self::UPLOAD_PATH . DIRECTORY_SEPARATOR . basename($fileName);
 

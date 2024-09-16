@@ -8,18 +8,17 @@ use App\Controllers\FileController;
 
 class App
 {
-    private $config;
+    private Config $config;
 
     public function __construct(
         private $router,
         private $container
     ) {
         $this->config = Config::getInstance();
-        $this->container = $container;
         $this->initializeRoutes();
     }
 
-    private function initializeRoutes()
+    private function initializeRoutes(): void
     {
         $controller = $this->container->get(FileController::class);
 
@@ -38,7 +37,7 @@ class App
         }
     }
 
-    public function run()
+    public function run(): void
     {
         $response = $this->router->dispatch($_SERVER['REQUEST_URI']);
         $responseType = $this->determineResponseType($response);
@@ -51,7 +50,7 @@ class App
         };
     }
 
-    private function determineResponseType($response)
+    private function determineResponseType(array $response): string
     {
         return match (true) {
             isset($response['view'], $response['data']) => 'view',
@@ -62,7 +61,7 @@ class App
         };
     }
 
-    private function handleUnknownResponseType()
+    private function handleUnknownResponseType(): void
     {
         Response::sendJson(["error" => "Неизвестный тип ответа"], 500);
     }

@@ -4,9 +4,9 @@ namespace Core\Traits;
 
 trait Singleton
 {
-    protected static $instance = null;
+    protected static ?self $instance = null;
 
-    public static function getInstance()
+    public static function getInstance(): self
     {
         self::$instance ??= new static();
         return self::$instance;

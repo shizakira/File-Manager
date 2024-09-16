@@ -4,22 +4,19 @@ namespace App\Services;
 
 class FileService
 {
-    private $fileRepository;
-    private $fileManager;
+    public function __construct(
+        private object $fileRepository,
+        private object $fileManager
+    ) {}
 
-    public function __construct($fileRepository, $fileManager)
-    {
-        $this->fileRepository = $fileRepository;
-        $this->fileManager = $fileManager;
-    }
-
-    public function getFileTree()
+    public function getFileTree(): array
     {
         $files = $this->fileRepository->getFiles();
+
         return $this->buildTree($files);
     }
 
-    public function addDirectory($dirname, $parentId)
+    public function addDirectory(string $dirname, ?int $parentId): string|bool
     {
         $parentPath = $this->getParentPath($parentId);
 
@@ -32,7 +29,7 @@ class FileService
         return true;
     }
 
-    public function uploadFile($fileName, $parentId, $tmpFilePath)
+    public function uploadFile(string $fileName, ?int $parentId, string $tmpFilePath): string|bool
     {
         $parentPath = $this->getParentPath($parentId);
         $uploadDir = $this->fileManager->getUploadPath($parentPath);
@@ -46,7 +43,7 @@ class FileService
         return true;
     }
 
-    public function deleteItem($id)
+    public function deleteItem(int $id): string|bool
     {
         $item = $this->fileRepository->getItemById($id);
 
@@ -70,7 +67,7 @@ class FileService
         return true;
     }
 
-    private function getParentPath($parentId)
+    private function getParentPath(?int $parentId): string
     {
         if ($parentId === null) {
             return '';
@@ -93,7 +90,7 @@ class FileService
         return implode('', array_reverse($path));
     }
 
-    private function buildTree($items, $parent_id = null)
+    private function buildTree(array $items, ?int $parent_id = null): array
     {
         $tree = [];
 

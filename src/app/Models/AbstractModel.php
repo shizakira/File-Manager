@@ -5,25 +5,25 @@ namespace App\Models;
 abstract class AbstractModel
 {
     public function __construct(
-        protected $id,
-        protected $name,
-        protected $parentId = null
+        protected int $id,
+        protected string $name,
+        protected ?int $parentId = null
     ) {}
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function getParentId()
+    public function getParentId(): ?int
     {
         return $this->parentId;
     }
 
-    abstract public function getType();
+    abstract public function getType(): string;
 }

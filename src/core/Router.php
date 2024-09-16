@@ -4,14 +4,14 @@ namespace Core;
 
 class Router
 {
-    private $routes = [];
+    private array $routes = [];
 
-    public function add($uri, $handler)
+    public function add(string $uri, callable $handler): void
     {
         $this->routes[$uri] = $handler;
     }
 
-    public function dispatch($uri)
+    public function dispatch(string $uri): ?array
     {
         $uriPath = strtok($uri, '?');
         $action = $this->getActionFromUri($uriPath, $this->getQueryParams($uri));
@@ -21,10 +21,10 @@ class Router
             return $handler();
         }
 
-        return;
+        return null;
     }
 
-    private function getQueryParams($uri)
+    private function getQueryParams(string $uri): array
     {
         $queryString = parse_url($uri, PHP_URL_QUERY);
         $queryParams = [];
@@ -35,7 +35,7 @@ class Router
 
         return $queryParams;
     }
-    private function getActionFromUri($uriPath, $queryParams)
+    private function getActionFromUri(string $uriPath, array $queryParams): string
     {
         if (isset($queryParams['action']) && !empty($queryParams['action'])) {
             return DIRECTORY_SEPARATOR . $queryParams['action'];

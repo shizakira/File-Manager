@@ -5,24 +5,25 @@ namespace App\Repositories;
 use Core\Database;
 use App\Repositories\Interfaces\FileRepositoryInterface;
 use App\Factories\ModelFactory;
+use App\Models\AbstractModel;
 
 class FileRepository implements FileRepositoryInterface
 {
-    private $pdo;
+    private \PDO $pdo;
 
     public function __construct()
     {
         $this->pdo = Database::getInstance()->getConnection();
     }
 
-    private function executeQuery($sql, $params = [])
+    private function executeQuery(string $sql, array $params = []): \PDOStatement
     {
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt;
     }
 
-    public function getFiles()
+    public function getFiles(): array
     {
         $sql = "SELECT * FROM files";
         $stmt = $this->executeQuery($sql);
@@ -31,32 +32,28 @@ class FileRepository implements FileRepositoryInterface
         return array_map([ModelFactory::class, 'createModel'], $results);
     }
 
-    public function getItemById($id)
+    public function getItemById(int $id): ?AbstractModel
     {
         $sql = "SELECT * FROM files WHERE id = :id";
         $stmt = $this->executeQuery($sql, ['id' => $id]);
         $result = $stmt->fetch();
 
-        if ($result) {
-            return ModelFactory::createModel($result);
-        }
-
-        return null;
+        return $result ? ModelFactory::createModel($result) : null;
     }
 
-    public function addDirectory($name, $parentId)
+    public function addDirectory(string $name, ?int $parentId): void
     {
         $sql = "INSERT INTO files (name, type, parent_id) VALUES (:name, 'directory', :parent_id)";
         $this->executeQuery($sql, ['name' => $name, 'parent_id' => $parentId]);
     }
 
-    public function uploadFile($name, $parentId)
+    public function uploadFile(string $name, ?int $parentId): void
     {
         $sql = "INSERT INTO files (name, type, parent_id) VALUES (:name, 'file', :parent_id)";
         $this->executeQuery($sql, ['name' => $name, 'parent_id' => $parentId]);
     }
 
-    public function deleteItem($id)
+    public function deleteItem(int $id): void
     {
         $sql = "DELETE FROM files WHERE id = :id";
         $this->executeQuery($sql, ['id' => $id]);

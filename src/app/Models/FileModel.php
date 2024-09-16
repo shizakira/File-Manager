@@ -6,7 +6,7 @@ use App\Models\AbstractModel;
 
 class FileModel extends AbstractModel
 {
-    public function getType()
+    public function getType(): string
     {
         return 'file';
     }

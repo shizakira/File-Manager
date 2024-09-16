@@ -8,21 +8,21 @@ class FileManager implements FileManagerInterface
 {
     private const UPLOAD_PATH = '/uploads';
 
-    public function getUploadPath($parentPath = ''): string
+    public function getUploadPath(string $parentPath = ''): string
     {
         $currentPath = self::UPLOAD_PATH . DIRECTORY_SEPARATOR . $parentPath;
 
         return $_SERVER['DOCUMENT_ROOT'] . $currentPath;
     }
 
-    public function createDirectory($dirname, $parentPath): bool
+    public function createDirectory(string $dirname, string $parentPath): bool
     {
         $directoryPath = $this->getUploadPath($parentPath) . $dirname;
 
         return is_dir($directoryPath) || mkdir($directoryPath, 0777, true);
     }
 
-    public function moveUploadedFile($tmpFilePath, $uploadDir, $fileName): bool
+    public function moveUploadedFile(string $tmpFilePath, string $uploadDir, string $fileName): bool
     {
         $filePath = $uploadDir . $fileName;
 
@@ -30,12 +30,12 @@ class FileManager implements FileManagerInterface
             move_uploaded_file($tmpFilePath, $filePath);
     }
 
-    public function deleteFile($filePath): bool
+    public function deleteFile(string $filePath): bool
     {
         return !is_file($filePath) || unlink($filePath);
     }
 
-    public function deleteDirectoryRecursively($directory): void
+    public function deleteDirectoryRecursively(string $directory): void
     {
         if (!is_dir($directory)) {
             return;

@@ -11,21 +11,21 @@ class Database
 {
     use Singleton;
 
-    private $pdo;
+    private PDO $pdo;
 
-    protected $driver = "";
-    protected $host = "";
-    protected $dbName = "";
-    protected $password = "";
-    protected $user = "";
+    protected string $driver = "";
+    protected string $host = "";
+    protected string $dbName = "";
+    protected string $password = "";
+    protected string $user = "";
 
-    protected function init()
+    protected function init(): void
     {
         $this->loadConfiguration();
         $this->makeConnect();
     }
 
-    protected function loadConfiguration()
+    protected function loadConfiguration(): void
     {
         $config = Config::getInstance();
         $this->driver = $config->getEnv("DB_DRIVER");
@@ -35,7 +35,7 @@ class Database
         $this->user = $config->getEnv("DB_USER");
     }
 
-    protected function makeConnect()
+    protected function makeConnect(): void
     {
         $dsn = "{$this->driver}:dbname={$this->dbName};host={$this->host}";
 
@@ -49,7 +49,7 @@ class Database
         }
     }
 
-    public function getConnection()
+    public function getConnection(): PDO
     {
         return $this->pdo;
     }

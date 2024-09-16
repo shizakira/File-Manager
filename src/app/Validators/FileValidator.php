@@ -3,51 +3,49 @@
 namespace App\Validators;
 
 use App\Validators\Interfaces\FileValidatorInterface;
+use Core\Config;
 
 class FileValidator implements FileValidatorInterface
 {
-    private const MAX_NAME_LENGTH = 255;
-    private const MAX_FILE_SIZE = 1024 * 1024 * 20;
-    private const ALLOWED_EXTENSIONS = [
-        'jpg',
-        'jpeg',
-        'png',
-        'gif',
-        'txt',
-        'docx',
-        'pdf'
-    ];
+    private Config $config;
 
-    public function validateName($name)
+    public function __construct()
     {
-        if (mb_strlen($name) > self::MAX_NAME_LENGTH) {
-            return "Имя не может превышать " . self::MAX_NAME_LENGTH . " символов.";
-        }
 
-        return;
+        $this->config = Config::getInstance();
     }
 
-    public function validateExtension($fileName)
+    public function validateName(string $name): ?string
+    {
+        if (mb_strlen($name) > $this->config::MAX_NAME_LENGTH) {
+            return "Имя не может превышать " . $this->config::MAX_NAME_LENGTH . " символов.";
+        }
+
+        return null;
+    }
+
+    public function validateExtension(string $fileName): ?string
     {
         $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
-        if (!in_array($extension, self::ALLOWED_EXTENSIONS, true)) {
-            $allowedExtensions = implode(', ', self::ALLOWED_EXTENSIONS);
+        if (!in_array($extension, $this->config::ALLOWED_EXTENSIONS, true)) {
+            $allowedExtensions = implode(', ', $this->config::ALLOWED_EXTENSIONS);
+
             return "Неверный формат файла. Разрешены только " . $allowedExtensions;
         }
 
-        return;
+        return null;
     }
 
-    public function validateFileSize($tmpFilePath)
+    public function validateFileSize(string $tmpFilePath): ?string
     {
         $fileSize = filesize($tmpFilePath);
 
-        if ($fileSize > self::MAX_FILE_SIZE) {
-            $maxFileSize = self::MAX_FILE_SIZE / 1024 / 1024;
+        if ($fileSize > $this->config::MAX_FILE_SIZE) {
+            $maxFileSize = $this->config::MAX_FILE_SIZE / 1024 / 1024;
             return "Размер файла не должен превышать " . $maxFileSize . " МБ.";
         }
 
-        return;
+        return null;
     }
 }

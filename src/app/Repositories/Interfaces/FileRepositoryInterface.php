@@ -5,8 +5,8 @@ namespace App\Repositories\Interfaces;
 interface FileRepositoryInterface
 {
     public function getFiles();
-    public function getItemById($id);
-    public function addDirectory($name, $parentId);
-    public function uploadFile($name, $parentId);
-    public function deleteItem($id);
+    public function getItemById(int $id);
+    public function addDirectory(string $name, ?int $parentId);
+    public function uploadFile(string $name, ?int $parentId);
+    public function deleteItem(int $id);
 }

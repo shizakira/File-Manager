@@ -4,6 +4,6 @@ namespace App\Views\Renderers\Interfaces;
 
 interface ViewRendererInterface
 {
-    public function renderTree($tree);
-    public function renderNode($node);
+    public function renderTree(array $tree);
+    public function renderNode(object $node);
 }

@@ -4,7 +4,7 @@ namespace App\Validators\Interfaces;
 
 interface FileValidatorInterface
 {
-    public function validateName($name);
-    public function validateExtension($fileName);
-    public function validateFileSize($tmpFilePath);
+    public function validateName(string $name);
+    public function validateExtension(string $fileName);
+    public function validateFileSize(string $tmpFilePath);
 }

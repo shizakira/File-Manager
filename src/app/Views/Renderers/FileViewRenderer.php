@@ -9,7 +9,7 @@ class FileViewRenderer implements ViewRendererInterface
     private const TREE = '/app/Views/tree.php';
     private const NODE = '/app/Views/node.php';
 
-    public function renderTree($tree)
+    public function renderTree($tree): string
     {
         if (empty($tree)) {
             return '';
@@ -21,7 +21,7 @@ class FileViewRenderer implements ViewRendererInterface
         return ob_get_clean();
     }
 
-    public function renderNode($node)
+    public function renderNode(object $node): string
     {
         $data = [
             'id' => htmlspecialchars($node->getId(), ENT_QUOTES),
@@ -36,7 +36,7 @@ class FileViewRenderer implements ViewRendererInterface
         return ob_get_clean();
     }
 
-    private function renderView($view, $data = [])
+    private function renderView(string $view, array $data = []): void
     {
         extract($data);
         include $view;

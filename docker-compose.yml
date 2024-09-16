@@ -11,9 +11,6 @@ services:
       - sw-mysql
     networks:
       - sw
-    # environment:
-    #   - COMPOSER_MEMORY_LIMIT=-1
-    # command: sh -c "composer install && php-fpm"
 
   sw-mysql:
     image: mysql
