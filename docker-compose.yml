@@ -5,12 +5,15 @@ services:
       dockerfile: ./.docker/php/Dockerfile
     volumes:
       - ./:/var/www
+      - ./vendor:/var/www/vendor
       - ./php-socket:/var/run/php
     restart: unless-stopped
     depends_on:
       - sw-mysql
     networks:
       - sw
+    command: >
+        sh -c "cd /var/www && composer install && chmod -R 777 /var/www/src/uploads && chmod -R 777 /var/run/php && php-fpm"
 
   sw-mysql:
     image: mysql
