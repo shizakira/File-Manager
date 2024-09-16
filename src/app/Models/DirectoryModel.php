@@ -8,11 +8,6 @@ class DirectoryModel extends AbstractModel
 {
     private $children = [];
 
-    public function __construct($id, $name, $parentId = null)
-    {
-        parent::__construct($id, $name, $parentId);
-    }
-
     public function getType()
     {
         return 'directory';
