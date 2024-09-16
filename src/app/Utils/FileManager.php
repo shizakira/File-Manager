@@ -8,53 +8,34 @@ class FileManager implements FileManagerInterface
 {
     private const UPLOAD_PATH = '/uploads';
 
-    public function getUploadPath($parentPath = '')
+    public function getUploadPath($parentPath = ''): string
     {
         $currentPath = self::UPLOAD_PATH . DIRECTORY_SEPARATOR . $parentPath;
 
         return $_SERVER['DOCUMENT_ROOT'] . $currentPath;
     }
 
-    public function createDirectory($dirname, $parentPath)
+    public function createDirectory($dirname, $parentPath): bool
     {
         $directoryPath = $this->getUploadPath($parentPath) . $dirname;
 
-        if (!is_dir($directoryPath)) {
-            if (!mkdir($directoryPath, 0777, true)) {
-                return false;
-            }
-        }
-
-        return true;
+        return is_dir($directoryPath) || mkdir($directoryPath, 0777, true);
     }
 
-    public function moveUploadedFile($tmpFilePath, $uploadDir, $fileName)
+    public function moveUploadedFile($tmpFilePath, $uploadDir, $fileName): bool
     {
         $filePath = $uploadDir . $fileName;
 
-        if (!is_dir($uploadDir)) {
-            if (!mkdir($uploadDir, 0777, true)) {
-                return false;
-            }
-        }
-
-        if (!move_uploaded_file($tmpFilePath, $filePath)) {
-            return false;
-        }
-
-        return true;
+        return (is_dir($uploadDir) || mkdir($uploadDir, 0777, true)) &&
+            move_uploaded_file($tmpFilePath, $filePath);
     }
 
-    public function deleteFile($filePath)
+    public function deleteFile($filePath): bool
     {
-        if (file_exists($filePath) && !unlink($filePath)) {
-            return false;
-        }
-
-        return true;
+        return !is_file($filePath) || unlink($filePath);
     }
 
-    public function deleteDirectoryRecursively($directory)
+    public function deleteDirectoryRecursively($directory): void
     {
         if (!is_dir($directory)) {
             return;
