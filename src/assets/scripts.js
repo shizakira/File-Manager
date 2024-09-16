@@ -69,49 +69,47 @@ function displayImage(event) {
     imagePreview.src = `uploads/${getFullPath(event.target)}`;
 }
 
-async function downloadFile() {
+function downloadFile() {
     const selectedFilePath = getFullPath(selectedElem);
 
-    try {
-        const response = await fetch(`uploads/${selectedFilePath}`);
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        const fileName = selectedFilePath.split("/").pop();
+    fetch(`uploads/${selectedFilePath}`)
+        .then((response) => response.blob())
+        .then((blob) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            const fileName = selectedFilePath.split("/").pop();
 
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    } catch (error) {
-        alert(error);
-    }
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        })
+        .catch((error) => alert(error));
 }
 
-async function addDirectory() {
+function addDirectory() {
     const dirname = directoryNameInput.value.trim();
     const parentId = selectedElem?.dataset.id || null;
 
-    try {
-        const response = await fetch("index.php?action=add_directory", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ dirname, parent_id: parentId }),
-        });
-
-        const data = await response.json();
-
-        response.ok ? location.reload() : alert(data.error);
-    } catch (error) {
-        alert(error);
-    }
+    fetch("index.php?action=add_directory", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ dirname, parent_id: parentId }),
+    })
+        .then((response) =>
+            response.json().then((data) => ({ ok: response.ok, data }))
+        )
+        .then(({ ok, data }) => {
+            ok ? location.reload() : alert(data.error);
+        })
+        .catch((error) => alert(error));
 }
 
-async function uploadFile() {
+function uploadFile() {
     const parentId = selectedElem?.dataset.id || null;
 
     const file = uploadInput.files[0];
@@ -120,36 +118,34 @@ async function uploadFile() {
     formData.append("file", file);
     formData.append("parent_id", parentId);
 
-    try {
-        const response = await fetch("index.php?action=upload_file", {
-            method: "POST",
-            body: formData,
-        });
-
-        const data = await response.json();
-
-        response.ok ? location.reload() : alert(data.error);
-    } catch (error) {
-        alert(error);
-    }
+    fetch("index.php?action=upload_file", {
+        method: "POST",
+        body: formData,
+    })
+        .then((response) =>
+            response.json().then((data) => ({ ok: response.ok, data }))
+        )
+        .then(({ ok, data }) => {
+            ok ? location.reload() : alert(data.error);
+        })
+        .catch((error) => alert(error));
 }
 
-async function deleteElement() {
-    try {
-        const response = await fetch("index.php?action=delete_item", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id: selectedElem?.dataset.id }),
-        });
-
-        const data = await response.json();
-
-        response.ok ? location.reload() : alert(data);
-    } catch (error) {
-        alert(error);
-    }
+function deleteElement() {
+    fetch("index.php?action=delete_item", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: selectedElem?.dataset.id }),
+    })
+        .then((response) =>
+            response.json().then((data) => ({ ok: response.ok, data }))
+        )
+        .then(({ ok, data }) => {
+            ok ? location.reload() : alert(data.error);
+        })
+        .catch((error) => alert(error));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
