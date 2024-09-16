@@ -4,16 +4,11 @@ namespace App\Models;
 
 abstract class AbstractModel
 {
-    protected $id;
-    protected $name;
-    protected $parentId;
-
-    public function __construct($id, $name, $parentId = null)
-    {
-        $this->id = $id;
-        $this->name = $name;
-        $this->parentId = $parentId;
-    }
+    public function __construct(
+        protected $id,
+        protected $name,
+        protected $parentId = null
+    ) {}
 
     public function getId()
     {

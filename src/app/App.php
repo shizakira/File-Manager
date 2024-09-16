@@ -4,24 +4,24 @@ namespace App;
 
 use Core\Config;
 use Core\Response;
+use App\Controllers\FileController;
 
 class App
 {
-    private $router;
-    private $controllerFactory;
     private $config;
 
-    public function __construct($router, $controllerFactory)
-    {
+    public function __construct(
+        private $router,
+        private $container
+    ) {
         $this->config = Config::getInstance();
-        $this->router = $router;
-        $this->controllerFactory = $controllerFactory;
+        $this->container = $container;
         $this->initializeRoutes();
     }
 
     private function initializeRoutes()
     {
-        $controller = $this->controllerFactory->createFileController();
+        $controller = $this->container->get(FileController::class);
 
         $routes = [
             'ROUTE_INDEX' => 'index',
