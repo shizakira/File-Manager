@@ -1,6 +1,5 @@
 access.log
 error.log
-composer.lock
 vendor/
 .env
 src/adminer.php
