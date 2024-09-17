@@ -1,0 +1,51 @@
+services:
+  sw-php:
+    build:
+      context: .
+      dockerfile: ./.docker/php/Dockerfile
+    volumes:
+      - ./:/var/www
+      - ./vendor:/var/www/vendor
+      - ./php-socket:/var/run/php
+    restart: unless-stopped
+    depends_on:
+      - sw-mysql
+    networks:
+      - sw
+    command: >
+        sh -c "cd /var/www && composer install && chmod -R 777 /var/www/src/uploads && chmod -R 777 /var/run/php && php-fpm"
+
+  sw-mysql:
+    image: mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    restart: unless-stopped
+    ports:
+      - ${DB_PORT}:3306
+    volumes:
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    networks:
+      - sw
+
+  sw-nginx:
+    image: nginx:latest
+    ports:
+      - 80:80 
+    depends_on:
+      - sw-php
+      - sw-mysql
+    restart: unless-stopped
+    volumes:
+      - ./.docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./:/var/www
+      - ./php-socket:/var/run/php
+    networks:
+      - sw
+
+networks:
+  sw:
+    driver: bridge
